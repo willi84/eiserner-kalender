@@ -42,11 +42,25 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Print runtime debug info
+        run: |
+          echo "date=$(date -Iseconds)"
+          echo "pwd=$(pwd)"
+          echo "node=$(node -v)"
+          echo "npm=$(npm -v)"
+          echo "ref=${GITHUB_REF}"
+          echo "sha=${GITHUB_SHA}"
+
       - name: Export files
+        env:
+          DEBUG_EXPORT: 'true'
         run: npm run export-json
 
-      - name: Print generated index
-        run: cat output/index.html
+      - name: Print generated output
+        run: |
+          ls -lah output
+          echo "--- output/index.html ---"
+          cat output/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
