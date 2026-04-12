@@ -26,14 +26,14 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Export JSON
+      - name: Export files
         run: npm run export-json
 
-      - name: Print JSON result
-        run: cat output/events.json
+      - name: Print generated index
+        run: cat output/index.html
 
-      - name: Upload JSON artifact
+      - name: Upload export artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: union-events-json
-          path: output/events.json
+          name: union-events-export
+          path: output
