@@ -18,17 +18,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  export:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -42,32 +37,24 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Print runtime debug info
-        run: |
-          echo "date=$(date -Iseconds)"
-          echo "pwd=$(pwd)"
-          echo "node=$(node -v)"
-          echo "npm=$(npm -v)"
-          echo "ref=${GITHUB_REF}"
-          echo "sha=${GITHUB_SHA}"
-
       - name: Export files
         env:
           DEBUG_EXPORT: 'true'
         run: npm run export-json
-
-      - name: Print generated output
-        run: |
-          ls -lah output
-          echo "--- output/index.html ---"
-          cat output/index.html
-      
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: output
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
