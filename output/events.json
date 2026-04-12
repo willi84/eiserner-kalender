@@ -1,0 +1,396 @@
+{
+  "verein": "1. FC Union Berlin",
+  "wettbewerb": "Bundesliga",
+  "saison": "2025/26",
+  "quelle": {
+    "name": "kalender.textilvergehen.de",
+    "url": "https://kalender.textilvergehen.de/unionspiele_maenner.ics",
+    "abgerufenAm": "2026-04-12"
+  },
+  "spiele": [
+    {
+      "datum": "2025-07-12",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 28,
+      "gegner": "Brandenburger SC Süd 05",
+      "spielort": "auswaerts",
+      "anstoss": "2025-07-12T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-07-13",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 28,
+      "gegner": "SV 1908 Grün-Weiss Ahrensfelde",
+      "spielort": "auswaerts",
+      "anstoss": "2025-07-13T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-07-19",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 29,
+      "gegner": "Linzer ASK",
+      "spielort": "auswaerts",
+      "anstoss": "2025-07-19T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-07-20",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 29,
+      "gegner": "SK Rapid Wien",
+      "spielort": "auswaerts",
+      "anstoss": "2025-07-20T16:00:00+02:00"
+    },
+    {
+      "datum": "2025-07-26",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 30,
+      "gegner": "SpVgg Greuther Fürth",
+      "spielort": "auswaerts",
+      "anstoss": "2025-07-26T14:00:00+02:00"
+    },
+    {
+      "datum": "2025-07-29",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 31,
+      "gegner": "1. FC Schweinfurt 05",
+      "spielort": "auswaerts",
+      "anstoss": "2025-07-29T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-08-02",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 31,
+      "gegner": "Espanyol Barcelona",
+      "spielort": "heim",
+      "anstoss": "2025-08-02T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-08-09",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 32,
+      "gegner": "Olympiakos Piräus",
+      "spielort": "heim",
+      "anstoss": "2025-08-09T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-08-15",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 33,
+      "gegner": "FC Gütersloh",
+      "spielort": "auswaerts",
+      "anstoss": "2025-08-15T18:00:00+02:00"
+    },
+    {
+      "datum": "2025-08-23",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 34,
+      "gegner": "VfB Stuttgart",
+      "spielort": "heim",
+      "anstoss": "2025-08-23T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-08-31",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 35,
+      "gegner": "Borussia Dortmund",
+      "spielort": "auswaerts",
+      "anstoss": "2025-08-31T17:30:00+02:00"
+    },
+    {
+      "datum": "2025-09-03",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 36,
+      "gegner": "VSG Altglienicke",
+      "spielort": "auswaerts",
+      "anstoss": "2025-09-03T18:30:00+02:00"
+    },
+    {
+      "datum": "2025-09-13",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 37,
+      "gegner": "TSG Hoffenheim",
+      "spielort": "heim",
+      "anstoss": "2025-09-13T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-09-21",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 38,
+      "gegner": "Eintracht Frankfurt",
+      "spielort": "auswaerts",
+      "anstoss": "2025-09-21T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-09-28",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 39,
+      "gegner": "Hamburger SV",
+      "spielort": "heim",
+      "anstoss": "2025-09-28T19:30:00+02:00"
+    },
+    {
+      "datum": "2025-10-04",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 40,
+      "gegner": "Bayer 04 Leverkusen",
+      "spielort": "auswaerts",
+      "anstoss": "2025-10-04T15:30:00+02:00"
+    },
+    {
+      "datum": "2025-10-08",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 41,
+      "gegner": "FSV Luckenwalde",
+      "spielort": "auswaerts",
+      "anstoss": "2025-10-08T18:30:00+02:00"
+    },
+    {
+      "datum": "2025-10-17",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 42,
+      "gegner": "Borussia Mönchengladbach",
+      "spielort": "heim",
+      "anstoss": "2025-10-17T20:30:00+02:00"
+    },
+    {
+      "datum": "2025-10-24",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 43,
+      "gegner": "SV Werder Bremen",
+      "spielort": "auswaerts",
+      "anstoss": "2025-10-24T20:30:00+02:00"
+    },
+    {
+      "datum": "2025-10-29",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 44,
+      "gegner": "Arminia Bielefeld",
+      "spielort": "heim",
+      "anstoss": "2025-10-29T20:45:00+01:00"
+    },
+    {
+      "datum": "2025-11-01",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 44,
+      "gegner": "SC Freiburg",
+      "spielort": "heim",
+      "anstoss": "2025-11-01T15:30:00+01:00"
+    },
+    {
+      "datum": "2025-11-08",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 45,
+      "gegner": "FC Bayern München",
+      "spielort": "heim",
+      "anstoss": "2025-11-08T15:30:00+01:00"
+    },
+    {
+      "datum": "2025-11-23",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 47,
+      "gegner": "FC St. Pauli",
+      "spielort": "auswaerts",
+      "anstoss": "2025-11-23T17:30:00+01:00"
+    },
+    {
+      "datum": "2025-11-29",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 48,
+      "gegner": "1. FC Heidenheim 1846",
+      "spielort": "heim",
+      "anstoss": "2025-11-29T15:30:00+01:00"
+    },
+    {
+      "datum": "2025-12-03",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 49,
+      "gegner": "FC Bayern München",
+      "spielort": "heim",
+      "anstoss": "2025-12-03T20:45:00+01:00"
+    },
+    {
+      "datum": "2025-12-06",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 49,
+      "gegner": "VfL Wolfsburg",
+      "spielort": "auswaerts",
+      "anstoss": "2025-12-06T15:30:00+01:00"
+    },
+    {
+      "datum": "2025-12-12",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 50,
+      "gegner": "RB Leipzig",
+      "spielort": "heim",
+      "anstoss": "2025-12-12T20:30:00+01:00"
+    },
+    {
+      "datum": "2025-12-20",
+      "isoWeekYear": 2025,
+      "kalenderwoche": 51,
+      "gegner": "1. FC Köln",
+      "spielort": "auswaerts",
+      "anstoss": "2025-12-20T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-01-05",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 2,
+      "gegner": "FC Erzgebirge Aue",
+      "spielort": "auswaerts",
+      "anstoss": "2026-01-05T18:30:00+01:00"
+    },
+    {
+      "datum": "2026-01-10",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 2,
+      "gegner": "1. FSV Mainz 05",
+      "spielort": "heim",
+      "anstoss": "2026-01-10T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-01-15",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 3,
+      "gegner": "FC Augsburg",
+      "spielort": "auswaerts",
+      "anstoss": "2026-01-15T20:30:00+01:00"
+    },
+    {
+      "datum": "2026-01-18",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 3,
+      "gegner": "VfB Stuttgart",
+      "spielort": "auswaerts",
+      "anstoss": "2026-01-18T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-01-24",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 4,
+      "gegner": "Borussia Dortmund",
+      "spielort": "heim",
+      "anstoss": "2026-01-24T18:30:00+01:00"
+    },
+    {
+      "datum": "2026-01-31",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 5,
+      "gegner": "TSG Hoffenheim",
+      "spielort": "auswaerts",
+      "anstoss": "2026-01-31T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-02-06",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 6,
+      "gegner": "Eintracht Frankfurt",
+      "spielort": "heim",
+      "anstoss": "2026-02-06T20:30:00+01:00"
+    },
+    {
+      "datum": "2026-02-14",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 7,
+      "gegner": "Hamburger SV",
+      "spielort": "auswaerts",
+      "anstoss": "2026-02-14T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-02-21",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 8,
+      "gegner": "Bayer 04 Leverkusen",
+      "spielort": "heim",
+      "anstoss": "2026-02-21T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-02-28",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 9,
+      "gegner": "Borussia Mönchengladbach",
+      "spielort": "auswaerts",
+      "anstoss": "2026-02-28T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-03-08",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 10,
+      "gegner": "SV Werder Bremen",
+      "spielort": "heim",
+      "anstoss": "2026-03-08T17:30:00+01:00"
+    },
+    {
+      "datum": "2026-03-15",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 11,
+      "gegner": "SC Freiburg",
+      "spielort": "auswaerts",
+      "anstoss": "2026-03-15T17:30:00+01:00"
+    },
+    {
+      "datum": "2026-03-21",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 12,
+      "gegner": "FC Bayern München",
+      "spielort": "auswaerts",
+      "anstoss": "2026-03-21T15:30:00+01:00"
+    },
+    {
+      "datum": "2026-04-05",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 14,
+      "gegner": "FC St. Pauli",
+      "spielort": "heim",
+      "anstoss": "2026-04-05T15:30:00+02:00"
+    },
+    {
+      "datum": "2026-04-11",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 15,
+      "gegner": "1. FC Heidenheim 1846",
+      "spielort": "auswaerts",
+      "anstoss": "2026-04-11T15:30:00+02:00"
+    },
+    {
+      "datum": "2026-04-18",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 16,
+      "gegner": "VfL Wolfsburg",
+      "spielort": "heim",
+      "anstoss": "2026-04-18T15:30:00+02:00"
+    },
+    {
+      "datum": "2026-04-24",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 17,
+      "gegner": "RB Leipzig",
+      "spielort": "auswaerts",
+      "anstoss": "2026-04-24T20:30:00+02:00"
+    },
+    {
+      "datum": "2026-05-02",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 18,
+      "gegner": "1. FC Köln",
+      "spielort": "heim",
+      "anstoss": "2026-05-02T15:30:00+02:00"
+    },
+    {
+      "datum": "2026-05-10",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 19,
+      "gegner": "1. FSV Mainz 05",
+      "spielort": "auswaerts",
+      "anstoss": "2026-05-10T19:30:00+02:00"
+    },
+    {
+      "datum": "2026-05-16",
+      "isoWeekYear": 2026,
+      "kalenderwoche": 20,
+      "gegner": "FC Augsburg",
+      "spielort": "heim",
+      "anstoss": "2026-05-16T15:30:00+02:00"
+    }
+  ]
+}

@@ -4,6 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "start": "tsx src/index.ts",
+    "export-json": "tsx src/index.ts",
     "test": "jest --env=jsdom --coverage --runInBand"
   },
   "repository": {
