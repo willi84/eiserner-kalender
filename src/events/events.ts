@@ -26,6 +26,19 @@ const SUMMARY_PREFIX = 'SUMMARY:';
 const EVENT_BLOCK_PATTERN = /BEGIN:VEVENT\r?\n[\s\S]*?\r?\nEND:VEVENT/g;
 const LINE_BREAK_PATTERN = /\r?\n/;
 
+const debugLog = (enabled: boolean, message: string, details?: Record<string, unknown>) => {
+    if (!enabled) {
+        return;
+    }
+
+    if (details) {
+        console.debug(`[debug][events] ${message}`, details);
+        return;
+    }
+
+    console.debug(`[debug][events] ${message}`);
+};
+
 const extractEventBlocks = (ics: string) => {
     const matches = ics.match(EVENT_BLOCK_PATTERN);
     return matches ?? [];
@@ -77,13 +90,40 @@ const getIsoWeek = (date: Date) => {
     return { isoWeekYear: target.getUTCFullYear(), kalenderwoche: week };
 };
 
-const parseEventBlock = (block: string): Spiel => {
+const parseEventBlock = (block: string, index: number, debug = false): Spiel => {
     const startsAtLine = readDateStart(block);
     const summary = readField(block, SUMMARY_PREFIX);
+
+    if (!summary) {
+        debugLog(debug, 'Event summary missing', { index });
+    }
+
+    if (!startsAtLine) {
+        debugLog(debug, 'Event DTSTART missing', { index, summary });
+    }
+
     const anstoss = toIsoDateTime(startsAtLine);
     const kickoffDate = new Date(anstoss);
+
+    if (Number.isNaN(kickoffDate.getTime())) {
+        debugLog(debug, 'Event kickoff could not be parsed', {
+            index,
+            startsAtLine,
+            parsedKickoff: anstoss,
+            summary,
+        });
+    }
+
     const { isoWeekYear, kalenderwoche } = getIsoWeek(kickoffDate);
     const { gegner, spielort } = parseTeams(summary);
+
+    debugLog(debug, 'Event parsed', {
+        index,
+        summary,
+        gegner,
+        spielort,
+        anstoss,
+    });
 
     return {
         datum: anstoss.slice(0, 10),
@@ -97,12 +137,29 @@ const parseEventBlock = (block: string): Spiel => {
 
 const getSourceName = (url: string) => new URL(url).hostname;
 
-export const convertIcsToJSON = (ics: string): Spiel[] => {
-    return extractEventBlocks(ics).map(parseEventBlock);
+export const convertIcsToJSON = (ics: string, debug = false): Spiel[] => {
+    const blocks = extractEventBlocks(ics);
+
+    debugLog(debug, 'VEVENT blocks extracted', {
+        blockCount: blocks.length,
+        icsLength: ics.length,
+    });
+
+    if (blocks.length === 0) {
+        debugLog(debug, 'No VEVENT blocks found in ICS payload');
+    }
+
+    return blocks.map((block, index) => parseEventBlock(block, index, debug));
 };
 
-export const getEvents = (url: string, ics: string, abgerufenAm: string): EventsResult => {
-    const spiele = convertIcsToJSON(ics);
+export const getEvents = (url: string, ics: string, abgerufenAm: string, debug = false): EventsResult => {
+    const spiele = convertIcsToJSON(ics, debug);
+
+    debugLog(debug, 'Events payload built', {
+        url,
+        fetchedAt: abgerufenAm,
+        eventCount: spiele.length,
+    });
 
     return {
         verein: UNION,
