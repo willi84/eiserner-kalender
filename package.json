@@ -1,0 +1,30 @@
+{
+  "name": "eiserner-kalender",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "test": "jest --env=jsdom --coverage --runInBand"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/willi84/eiserner-kalender.git"
+  },
+  "author": "Robert Willemelis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/willi84/eiserner-kalender/issues"
+  },
+  "homepage": "https://github.com/willi84/eiserner-kalender#readme",
+  "description": "",
+  "dependencies": {
+    "jest": "^29.6.2",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.6.0",
+    "jest-environment-jsdom": "^29.6.2",
+    "ts-jest": "^29.1.1"
+  }
+}
