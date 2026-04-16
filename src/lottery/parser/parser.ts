@@ -10,12 +10,15 @@ type LotterySearchItem = {
 type LotterySearchResponse = {
     data?: {
         news?: LotterySearchItem[];
+        totalPages?: number;
     };
 };
 
 export type LotteryArticle = {
     opponent: string;
     articleUrl: string;
+    partie: string;
+    updatedAt: string | null;
     events: LotteryArticleEvent[];
 };
 
@@ -29,6 +32,7 @@ export type LotteryArticleEvent = {
 const ARTICLE_BASE_URL = 'https://www.fc-union-berlin.de';
 const LOTTERY_HEADLINE_PATTERN = /losverfahren/i;
 const OPPONENT_PATTERN = /^1\.\s*FC Union Berlin\s+vs\.?\s*(.+)$/i;
+const PARTIE_PATTERN = /^1\.\s*FC Union Berlin\s+vs\.?\s*.+$/i;
 const LOSBUCHUNG_LABEL = 'Losbuchung';
 const LOSGEWINNER_LABEL = 'Platzkarte Losgewinner';
 const MULTIPLE_NEWLINES_PATTERN = /\n{2,}/g;
@@ -121,12 +125,6 @@ const extractEvent = (lines: string[], index: number, opponent: string) => {
     } satisfies LotteryArticleEvent;
 };
 
-const extractArticleText = (html: string) => {
-    const root = parse(html);
-    const content = root.querySelector('.richtext-table') ?? root.querySelector('article') ?? root;
-    return normalizeWhitespace(content.structuredText);
-};
-
 export const extractArticleUrlsFromSearchResponse = (payload: string) => {
     const response = JSON.parse(payload) as LotterySearchResponse;
     const articleUrls = (response.data?.news ?? [])
@@ -136,30 +134,43 @@ export const extractArticleUrlsFromSearchResponse = (payload: string) => {
     return unique(articleUrls);
 };
 
-export const parseLotteryArticle = (articleUrl: string, html: string): LotteryArticle[] => {
-    const text = extractArticleText(html);
-    const lines = text.split('\n');
-    const opponents = findMatchingLines(text, OPPONENT_PATTERN)
-        .map((line) => {
-            const match = line.match(OPPONENT_PATTERN);
-            return match?.[1]?.trim() ?? '';
-        })
-        .filter(Boolean);
+export const extractTotalPagesFromSearchResponse = (payload: string) => {
+    const response = JSON.parse(payload) as LotterySearchResponse;
+    return response.data?.totalPages ?? 1;
+};
 
-    if (opponents.length === 0) {
+export const parseLotteryArticle = (articleUrl: string, html: string): LotteryArticle[] => {
+    const root = parse(html);
+    const content = root.querySelector('.richtext-table') ?? root.querySelector('article') ?? root;
+    const text = normalizeWhitespace(content.structuredText);
+    const lines = text.split('\n');
+    const updatedAt = root.querySelector('time')?.getAttribute('datetime') ?? null;
+    const parties = findMatchingLines(text, PARTIE_PATTERN)
+        .map((partie) => {
+            const match = partie.match(OPPONENT_PATTERN);
+            return {
+                opponent: match?.[1]?.trim() ?? '',
+                partie,
+            };
+        })
+        .filter(({ opponent }) => Boolean(opponent));
+
+    if (parties.length === 0) {
         return [];
     }
 
-    const articles = opponents.map((opponent) => ({
+    const articles = parties.map(({ opponent, partie }) => ({
         opponent,
         articleUrl,
+        partie,
+        updatedAt,
         events: [] as LotteryArticleEvent[],
     }));
 
     let currentOpponentIndex = -1;
 
     lines.forEach((line, index) => {
-        if (OPPONENT_PATTERN.test(line)) {
+        if (PARTIE_PATTERN.test(line)) {
             currentOpponentIndex += 1;
             return;
         }

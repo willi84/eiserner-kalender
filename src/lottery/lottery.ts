@@ -1,7 +1,11 @@
 import { createHash } from 'node:crypto';
 import { command } from '../cmd/cmd';
 import { createLotteryIcs } from './ical/ical';
-import { extractArticleUrlsFromSearchResponse, parseLotteryArticle } from './parser/parser';
+import {
+    extractArticleUrlsFromSearchResponse,
+    extractTotalPagesFromSearchResponse,
+    parseLotteryArticle,
+} from './parser/parser';
 
 type LotteryEventType = 'losbuchung' | 'losgewinnerverkauf';
 
@@ -9,9 +13,11 @@ type LotteryEvent = {
     articleUrl: string;
     endsAt: string;
     opponent: string;
+    partie: string;
     startsAt: string;
     summary: string;
     type: LotteryEventType;
+    updatedAt: string | null;
 };
 
 type LotteryExport = {
@@ -33,10 +39,10 @@ type LotteryFeed = {
 
 const CLUB = '1. FC Union Berlin';
 const SEARCH_TERM = 'losverfahren';
-const SEARCH_PAGE_LIMIT = 10;
+const SEARCH_PAGE_LIMIT = 50;
 const SEARCH_ENDPOINT = 'https://www.fc-union-berlin.de/api/v1/de/news/search?page=1';
 
-const escapeShellArg = (value: string) => `'${value.replace(/'/g, `'"'"'`)}'`;
+const escapeShellArg = (value: string) => `'${value.replace(/'/g, `"'"'`)}'`;
 
 const fetchTextSync = (url: string) => {
     const response = command(`curl -sL ${escapeShellArg(url)}`);
@@ -51,22 +57,36 @@ const fetchTextSync = (url: string) => {
 const createSearchUrl = (page: number) => {
     const url = new URL(SEARCH_ENDPOINT);
     url.searchParams.set('page', String(page));
+    console.log(`process page ${page} [${url.toString()}]`);
     return url.toString();
 };
 
+const getSearchPages = (totalPages: number) => {
+    const pages: number[] = [];
+    const lastPage = Math.max(1, Math.min(totalPages, SEARCH_PAGE_LIMIT));
+
+    for (let page = 1; page <= lastPage; page += 1) {
+        pages.push(page);
+    }
+
+    return pages;
+};
+
 const getSearchArticleUrls = () => {
+    const firstPageResponse = fetchTextSync(createSearchUrl(1));
+    const totalPages = extractTotalPagesFromSearchResponse(firstPageResponse);
     const articleUrls: string[] = [];
 
-    for (let page = 1; page <= SEARCH_PAGE_LIMIT; page += 1) {
-        const searchResponse = fetchTextSync(createSearchUrl(page));
+    getSearchPages(totalPages).forEach((page) => {
+        const searchResponse = page === 1 ? firstPageResponse : fetchTextSync(createSearchUrl(page));
         const pageArticleUrls = extractArticleUrlsFromSearchResponse(searchResponse);
 
         if (pageArticleUrls.length === 0) {
-            continue;
+            return;
         }
 
         articleUrls.push(...pageArticleUrls);
-    }
+    });
 
     return Array.from(new Set(articleUrls));
 };
@@ -93,10 +113,30 @@ const toFeed = (fansNewsUrl: string, abgerufenAm: string, events: LotteryEvent[]
     };
 };
 
+const formatUpdatedAt = (updatedAt: string | null) => {
+    if (!updatedAt) {
+        return 'unbekannt';
+    }
+
+    return new Intl.DateTimeFormat('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    }).format(new Date(updatedAt));
+};
+
+const createDescription = (event: LotteryEvent) => {
+    return [
+        `- Partie: ${event.partie}`,
+        `- Aktualisiert: ${formatUpdatedAt(event.updatedAt)}`,
+        `- Quelle: ${event.articleUrl}`,
+    ].join('\n');
+};
+
 const toIcs = (events: LotteryEvent[]) => {
     return createLotteryIcs(
         sortEvents(events).map((event) => ({
-            description: `${event.summary}\nQuelle: ${event.articleUrl}`,
+            description: createDescription(event),
             endsAt: event.endsAt,
             startsAt: event.startsAt,
             summary: event.summary,
@@ -119,9 +159,11 @@ export const createLotteryExport = (): LotteryExport => {
                 articleUrl: article.articleUrl,
                 endsAt: event.endsAt,
                 opponent: article.opponent,
+                partie: article.partie,
                 startsAt: event.startsAt,
                 summary: event.summary,
                 type: event.type,
+                updatedAt: article.updatedAt,
             })),
         );
     const abgerufenAm = new Date().toISOString().slice(0, 10);

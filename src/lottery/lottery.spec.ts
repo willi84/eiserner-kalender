@@ -1,5 +1,9 @@
 import { createLotteryIcs } from './ical/ical';
-import { extractArticleUrlsFromSearchResponse, parseLotteryArticle } from './parser/parser';
+import {
+    extractArticleUrlsFromSearchResponse,
+    extractTotalPagesFromSearchResponse,
+    parseLotteryArticle,
+} from './parser/parser';
 
 describe('lottery parser', () => {
     it('extracts article links from the search endpoint response', () => {
@@ -28,9 +32,22 @@ describe('lottery parser', () => {
         ]);
     });
 
+    it('extracts the total page count from the search endpoint response', () => {
+        const response = JSON.stringify({
+            data: {
+                totalPages: 809,
+            },
+        });
+
+        expect(extractTotalPagesFromSearchResponse(response)).toBe(809);
+    });
+
     it('parses multiple lottery windows from an article', () => {
         const articleHtml = `
             <article>
+                <header>
+                    <time datetime="2026-04-16T08:30:00.000Z">16. April 2026</time>
+                </header>
                 <div class="richtext-table">
                     <p><strong>1. FC Union Berlin vs. FC St. Pauli</strong></p>
                     <ul>
@@ -58,6 +75,8 @@ describe('lottery parser', () => {
             {
                 articleUrl: 'https://example.com/article',
                 opponent: 'FC St. Pauli',
+                partie: '1. FC Union Berlin vs. FC St. Pauli',
+                updatedAt: '2026-04-16T08:30:00.000Z',
                 events: [
                     {
                         type: 'losbuchung',
@@ -76,6 +95,8 @@ describe('lottery parser', () => {
             {
                 articleUrl: 'https://example.com/article',
                 opponent: 'VfL Wolfsburg',
+                partie: '1. FC Union Berlin vs.VfL Wolfsburg',
+                updatedAt: '2026-04-16T08:30:00.000Z',
                 events: [
                     {
                         type: 'losbuchung',
@@ -99,7 +120,11 @@ describe('createLotteryIcs()', () => {
     it('creates a valid ical feed with lottery events', () => {
         const ics = createLotteryIcs([
             {
-                description: 'Quelle: https://example.com/article',
+                description: [
+                    '- Partie: 1. FC Union Berlin vs. FC St. Pauli',
+                    '- Aktualisiert: 16.04.2026',
+                    '- Quelle: https://example.com/article',
+                ].join('\n'),
                 endsAt: '2026-03-23T09:00:00',
                 startsAt: '2026-03-20T10:00:00',
                 summary: '⚽️🎲 Losbuchung: FC St. Pauli',
@@ -110,6 +135,9 @@ describe('createLotteryIcs()', () => {
 
         expect(ics).toContain('BEGIN:VCALENDAR');
         expect(ics).toContain('SUMMARY:⚽️🎲 Losbuchung: FC St. Pauli');
+        expect(ics).toContain(
+            'DESCRIPTION:- Partie: 1. FC Union Berlin vs. FC St. Pauli\\n- Aktualisiert: 16.04.2026\\n- Quelle: https://example.com/article',
+        );
         expect(ics).toContain('DTSTART:20260320T100000');
         expect(ics).toContain('DTEND:20260323T090000');
         expect(ics).toContain('END:VCALENDAR');
