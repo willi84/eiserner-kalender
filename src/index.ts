@@ -1,5 +1,6 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { getEvents } from './events/events';
+import { createLotteryExport } from './lottery/lottery';
 
 type CalendarExport = {
     label: string;
@@ -9,6 +10,8 @@ type CalendarExport = {
 
 type ExportResult = {
     abgerufenAm: string;
+    content: string;
+    format: 'json' | 'ics';
     json: string;
     label: string;
     outputFile: string;
@@ -83,6 +86,7 @@ const exportCalendar = async ({ label, outputFile, url }: CalendarExport): Promi
     const ics = await fetchIcs(url);
     const abgerufenAm = new Date().toISOString().slice(0, 10);
     const events = getEvents(url, ics, abgerufenAm, DEBUG_EXPORT);
+    const json = JSON.stringify(events, null, 2);
 
     debugLog('Calendar export parsed', {
         label,
@@ -93,16 +97,41 @@ const exportCalendar = async ({ label, outputFile, url }: CalendarExport): Promi
 
     return {
         abgerufenAm,
-        json: JSON.stringify(events, null, 2),
+        content: json,
+        format: 'json',
+        json,
         label,
         outputFile,
     };
 };
 
+export const exportLottery = async (): Promise<ExportResult[]> => {
+    const lottery = await createLotteryExport();
+
+    return [
+        {
+            abgerufenAm: lottery.abgerufenAm,
+            content: lottery.json,
+            format: 'json',
+            json: lottery.json,
+            label: 'Losverfahren JSON',
+            outputFile: 'union_lottery.json',
+        },
+        {
+            abgerufenAm: lottery.abgerufenAm,
+            content: lottery.ics,
+            format: 'ics',
+            json: lottery.json,
+            label: 'Losverfahren iCal',
+            outputFile: 'union_lottery.ics',
+        },
+    ];
+};
+
 export const createIndexHtml = (exports: ExportResult[]) => {
     const listItems = exports
-        .map(({ abgerufenAm, label, outputFile }) => {
-            return `      <li><a href="./${outputFile}">${label} JSON</a> <span>Erstellt am: ${abgerufenAm}</span></li>`;
+        .map(({ abgerufenAm, format, label, outputFile }) => {
+            return `      <li><a href="./${outputFile}">${label}</a> <span>Format: ${format.toUpperCase()} | Erstellt am: ${abgerufenAm}</span></li>`;
         })
         .join('\n');
 
@@ -131,10 +160,12 @@ export const runExport = async () => {
         calendars: CALENDARS.map(({ label, outputFile, url }) => ({ label, outputFile, url })),
     });
 
-    const exports = await Promise.all(CALENDARS.map(exportCalendar));
+    const calendarExports = await Promise.all(CALENDARS.map(exportCalendar));
+    const lotteryExports = await exportLottery();
+    const exports = [...calendarExports, ...lotteryExports];
 
     await removeLegacyOutputFiles();
-    await Promise.all(exports.map(({ json, outputFile }) => writeOutputFile(outputFile, json)));
+    await Promise.all(exports.map(({ content, outputFile }) => writeOutputFile(outputFile, content)));
     await writeOutputFile('index.html', createIndexHtml(exports));
 
     debugLog('Export run finished', {
@@ -142,8 +173,8 @@ export const runExport = async () => {
     });
 
     exports.forEach(({ json, label }) => {
-        console.log(`${label}:`);
-        console.log(json);
+        // console.log(`${label}:`);
+        // console.log(json);
     });
 };
 
