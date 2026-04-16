@@ -1,5 +1,8 @@
 import { createHash } from 'node:crypto';
+import type { Spiel } from '../events/events';
 import { command } from '../cmd/cmd';
+import { TEXT_RECOGNITION_SYNONYMS } from '../config/text-recognition-synonyms';
+import { getCanonicalTeamName, normalizeTeamValue } from '../teams/team-synonyms/team-synonyms';
 import { createLotteryIcs } from './ical/ical';
 import {
     extractArticleUrlsFromSearchResponse,
@@ -20,8 +23,18 @@ type LotteryEvent = {
     updatedAt: string | null;
 };
 
-type LotteryExport = {
+export type LotteryCalendarDebugReport = {
+    calendarGameCount: number;
+    missingCalendarGames: string[];
+    recognizedCalendarGameCount: number;
+    recognizedCalendarGames: string[];
+    searchTerms: string[];
+    unmatchedLotteryGames: string[];
+};
+
+export type LotteryExport = {
     abgerufenAm: string;
+    debug: LotteryCalendarDebugReport;
     fansNewsUrl: string;
     ics: string;
     json: string;
@@ -31,14 +44,14 @@ type LotteryFeed = {
     quelle: {
         abgerufenAm: string;
         fansNewsUrl: string;
-        searchTerm: string;
+        searchTerms: string[];
     };
     termine: LotteryEvent[];
     verein: string;
 };
 
 const CLUB = '1. FC Union Berlin';
-const SEARCH_TERM = 'losverfahren';
+const DEFAULT_SEARCH_TERMS = [...TEXT_RECOGNITION_SYNONYMS.lottery];
 const SEARCH_PAGE_LIMIT = 50;
 const SEARCH_ENDPOINT = 'https://www.fc-union-berlin.de/api/v1/de/news/search?page=1';
 
@@ -52,6 +65,15 @@ const fetchTextSync = (url: string) => {
     }
 
     return response;
+};
+
+const getSearchTerms = () => {
+    const configuredTerms = process.env.LOTTERY_SEARCH_TERMS
+        ?.split(',')
+        .map((term) => term.trim())
+        .filter(Boolean);
+
+    return configuredTerms?.length ? configuredTerms : DEFAULT_SEARCH_TERMS;
 };
 
 const createSearchUrl = (page: number) => {
@@ -72,14 +94,14 @@ const getSearchPages = (totalPages: number) => {
     return pages;
 };
 
-const getSearchArticleUrls = () => {
+const getSearchArticleUrls = (searchTerms: string[]) => {
     const firstPageResponse = fetchTextSync(createSearchUrl(1));
     const totalPages = extractTotalPagesFromSearchResponse(firstPageResponse);
     const articleUrls: string[] = [];
 
     getSearchPages(totalPages).forEach((page) => {
         const searchResponse = page === 1 ? firstPageResponse : fetchTextSync(createSearchUrl(page));
-        const pageArticleUrls = extractArticleUrlsFromSearchResponse(searchResponse);
+        const pageArticleUrls = extractArticleUrlsFromSearchResponse(searchResponse, searchTerms);
 
         if (pageArticleUrls.length === 0) {
             return;
@@ -101,12 +123,17 @@ const createUid = (event: LotteryEvent) => {
         .digest('hex');
 };
 
-const toFeed = (fansNewsUrl: string, abgerufenAm: string, events: LotteryEvent[]): LotteryFeed => {
+const toFeed = (
+    fansNewsUrl: string,
+    abgerufenAm: string,
+    searchTerms: string[],
+    events: LotteryEvent[],
+): LotteryFeed => {
     return {
         quelle: {
             abgerufenAm,
             fansNewsUrl,
-            searchTerm: SEARCH_TERM,
+            searchTerms,
         },
         termine: sortEvents(events),
         verein: CLUB,
@@ -146,8 +173,55 @@ const toIcs = (events: LotteryEvent[]) => {
     );
 };
 
-export const createLotteryExport = (): LotteryExport => {
-    const articleUrls = getSearchArticleUrls();
+const getUniqueOpponents = (values: string[]) => {
+    return Array.from(new Set(values.map((value) => getCanonicalTeamName(value)))).sort((left, right) =>
+        left.localeCompare(right, 'de-DE'),
+    );
+};
+
+export const createLotteryCalendarDebugReport = (
+    calendarGames: Spiel[],
+    events: LotteryEvent[],
+    searchTerms: string[],
+): LotteryCalendarDebugReport => {
+    const calendarGamesByOpponent = new Map(
+        getUniqueOpponents(calendarGames.map(({ gegner }) => gegner)).map((opponent) => [
+            normalizeTeamValue(opponent),
+            opponent,
+        ]),
+    );
+    const lotteryOpponentsByName = new Map(
+        getUniqueOpponents(events.map(({ opponent }) => opponent)).map((opponent) => [
+            normalizeTeamValue(opponent),
+            opponent,
+        ]),
+    );
+    const recognizedCalendarGames = Array.from(calendarGamesByOpponent.entries())
+        .filter(([normalizedOpponent]) => lotteryOpponentsByName.has(normalizedOpponent))
+        .map(([, opponent]) => opponent)
+        .sort((left, right) => left.localeCompare(right, 'de-DE'));
+    const missingCalendarGames = Array.from(calendarGamesByOpponent.entries())
+        .filter(([normalizedOpponent]) => !lotteryOpponentsByName.has(normalizedOpponent))
+        .map(([, opponent]) => opponent)
+        .sort((left, right) => left.localeCompare(right, 'de-DE'));
+    const unmatchedLotteryGames = Array.from(lotteryOpponentsByName.entries())
+        .filter(([normalizedOpponent]) => !calendarGamesByOpponent.has(normalizedOpponent))
+        .map(([, opponent]) => opponent)
+        .sort((left, right) => left.localeCompare(right, 'de-DE'));
+
+    return {
+        calendarGameCount: calendarGamesByOpponent.size,
+        missingCalendarGames,
+        recognizedCalendarGameCount: recognizedCalendarGames.length,
+        recognizedCalendarGames,
+        searchTerms,
+        unmatchedLotteryGames,
+    };
+};
+
+export const createLotteryExport = (calendarGames: Spiel[] = []): LotteryExport => {
+    const searchTerms = getSearchTerms();
+    const articleUrls = getSearchArticleUrls(searchTerms);
     const articlePayloads = articleUrls.map((articleUrl) => {
         const articleHtml = fetchTextSync(articleUrl);
         return parseLotteryArticle(articleUrl, articleHtml);
@@ -158,7 +232,7 @@ export const createLotteryExport = (): LotteryExport => {
             article.events.map((event) => ({
                 articleUrl: article.articleUrl,
                 endsAt: event.endsAt,
-                opponent: article.opponent,
+                opponent: getCanonicalTeamName(article.opponent),
                 partie: article.partie,
                 startsAt: event.startsAt,
                 summary: event.summary,
@@ -167,10 +241,11 @@ export const createLotteryExport = (): LotteryExport => {
             })),
         );
     const abgerufenAm = new Date().toISOString().slice(0, 10);
-    const feed = toFeed(SEARCH_ENDPOINT, abgerufenAm, events);
+    const feed = toFeed(SEARCH_ENDPOINT, abgerufenAm, searchTerms, events);
 
     return {
         abgerufenAm,
+        debug: createLotteryCalendarDebugReport(calendarGames, feed.termine, searchTerms),
         fansNewsUrl: SEARCH_ENDPOINT,
         ics: toIcs(feed.termine),
         json: JSON.stringify(feed, null, 2),

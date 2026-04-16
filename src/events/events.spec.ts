@@ -38,11 +38,55 @@ describe('getEvents()', () => {
                     datum: '2025-10-29',
                     isoWeekYear: 2025,
                     kalenderwoche: 44,
-                    gegner: 'Arminia Bielefeld',
+                    gegner: 'DSC Arminia Bielefeld',
                     spielort: 'heim',
                     anstoss: '2025-10-29T20:45:00+01:00',
                 },
             ],
         });
+    });
+
+    it('normalizes configured opponent aliases to a central team name', () => {
+        const mockedIcs = [
+            'BEGIN:VCALENDAR',
+            'BEGIN:VEVENT',
+            'DTSTART;TZID="+02:00":20250823T153000',
+            'SUMMARY:1. FC Union Berlin vs. 1. FC Koeln',
+            'END:VEVENT',
+            'END:VCALENDAR',
+        ].join('\n');
+
+        expect(getEvents(url, mockedIcs, abgerufenAm).spiele).toEqual([
+            {
+                datum: '2025-08-23',
+                isoWeekYear: 2025,
+                kalenderwoche: 34,
+                gegner: '1. FC Köln',
+                spielort: 'heim',
+                anstoss: '2025-08-23T15:30:00+02:00',
+            },
+        ]);
+    });
+
+    it('normalizes newly configured second division teams', () => {
+        const mockedIcs = [
+            'BEGIN:VCALENDAR',
+            'BEGIN:VEVENT',
+            'DTSTART;TZID="+02:00":20250913T133000',
+            'SUMMARY:1. FC Union Berlin vs. Hertha Berlin',
+            'END:VEVENT',
+            'END:VCALENDAR',
+        ].join('\n');
+
+        expect(getEvents(url, mockedIcs, abgerufenAm).spiele).toEqual([
+            {
+                datum: '2025-09-13',
+                isoWeekYear: 2025,
+                kalenderwoche: 37,
+                gegner: 'Hertha BSC',
+                spielort: 'heim',
+                anstoss: '2025-09-13T13:30:00+02:00',
+            },
+        ]);
     });
 });

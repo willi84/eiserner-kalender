@@ -1,6 +1,8 @@
-type Spielort = 'heim' | 'auswaerts';
+import { getCanonicalTeamName } from '../teams/team-synonyms/team-synonyms';
 
-type Spiel = {
+export type Spielort = 'heim' | 'auswaerts';
+
+export type Spiel = {
     datum: string;
     isoWeekYear: number;
     kalenderwoche: number;
@@ -9,7 +11,7 @@ type Spiel = {
     anstoss: string;
 };
 
-type EventsResult = {
+export type EventsResult = {
     verein: string;
     wettbewerb: string;
     saison: string;
@@ -61,7 +63,7 @@ const readDateStart = (block: string) => {
 const parseTeams = (summary: string) => {
     const [homeTeam = '', awayTeam = ''] = summary.split(' vs. ');
     const isHome = homeTeam === UNION;
-    const gegner = isHome ? awayTeam : homeTeam;
+    const gegner = getCanonicalTeamName(isHome ? awayTeam : homeTeam);
 
     return {
         gegner,

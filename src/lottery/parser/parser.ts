@@ -1,4 +1,5 @@
 import { parse } from 'node-html-parser';
+import { getCanonicalTeamName } from '../../teams/team-synonyms/team-synonyms';
 
 type LotteryEventType = 'losbuchung' | 'losgewinnerverkauf';
 
@@ -30,7 +31,6 @@ export type LotteryArticleEvent = {
 };
 
 const ARTICLE_BASE_URL = 'https://www.fc-union-berlin.de';
-const LOTTERY_HEADLINE_PATTERN = /losverfahren/i;
 const OPPONENT_PATTERN = /^1\.\s*FC Union Berlin\s+vs\.?\s*(.+)$/i;
 const PARTIE_PATTERN = /^1\.\s*FC Union Berlin\s+vs\.?\s*.+$/i;
 const LOSBUCHUNG_LABEL = 'Losbuchung';
@@ -65,9 +65,24 @@ const normalizeWhitespace = (value: string) => {
         .join('\n');
 };
 
+const normalizeText = (value: string) => {
+    return value
+        .toLocaleLowerCase('de-DE')
+        .replace(/ä/g, 'ae')
+        .replace(/ö/g, 'oe')
+        .replace(/ü/g, 'ue')
+        .replace(/ß/g, 'ss');
+};
+
 const toAbsoluteUrl = (url: string) => new URL(url, ARTICLE_BASE_URL).toString();
 
 const unique = (values: string[]) => Array.from(new Set(values));
+
+const matchesSearchTerms = (headline: string, searchTerms: string[]) => {
+    const normalizedHeadline = normalizeText(headline);
+
+    return searchTerms.some((searchTerm) => normalizedHeadline.includes(normalizeText(searchTerm)));
+};
 
 const findMatchingLines = (text: string, pattern: RegExp) => {
     return text
@@ -125,10 +140,10 @@ const extractEvent = (lines: string[], index: number, opponent: string) => {
     } satisfies LotteryArticleEvent;
 };
 
-export const extractArticleUrlsFromSearchResponse = (payload: string) => {
+export const extractArticleUrlsFromSearchResponse = (payload: string, searchTerms: string[]) => {
     const response = JSON.parse(payload) as LotterySearchResponse;
     const articleUrls = (response.data?.news ?? [])
-        .filter(({ headline }) => LOTTERY_HEADLINE_PATTERN.test(headline))
+        .filter(({ headline }) => matchesSearchTerms(headline, searchTerms))
         .map(({ detailLink }) => toAbsoluteUrl(detailLink));
 
     return unique(articleUrls);
@@ -149,7 +164,7 @@ export const parseLotteryArticle = (articleUrl: string, html: string): LotteryAr
         .map((partie) => {
             const match = partie.match(OPPONENT_PATTERN);
             return {
-                opponent: match?.[1]?.trim() ?? '',
+                opponent: getCanonicalTeamName(match?.[1]?.trim() ?? ''),
                 partie,
             };
         })

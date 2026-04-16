@@ -1,0 +1,52 @@
+export type TeamSynonymsConfig = {
+    teams: Record<string, string[]>;
+    version: number;
+};
+
+export const TEAM_SYNONYMS_CONFIG: TeamSynonymsConfig = {
+    version: 2,
+    teams: {
+        '1. FC Heidenheim 1846': ['1. FC Heidenheim', 'FC Heidenheim', 'Heidenheim'],
+        '1. FC Kaiserslautern': ['FC Kaiserslautern', 'Kaiserslautern'],
+        '1. FC Köln': ['FC Köln', '1. FC Koeln', 'FC Koeln', 'Köln', 'Koeln', 'Cologne'],
+        '1. FC Magdeburg': ['FC Magdeburg', 'Magdeburg'],
+        '1. FC Nürnberg': ['FC Nürnberg', 'FC Nuernberg', 'Nürnberg', 'Nuernberg', 'Nuremberg'],
+        '1. FC Union Berlin': ['Union Berlin', 'FC Union Berlin'],
+        '1. FSV Mainz 05': ['FSV Mainz 05', 'Mainz 05', 'Mainz'],
+        'Bayer 04 Leverkusen': ['Bayer Leverkusen', 'Leverkusen'],
+        'Borussia Dortmund': ['BVB', 'Dortmund'],
+        'Borussia Mönchengladbach': [
+            'Gladbach',
+            'Bor. Mönchengladbach',
+            'Borussia Moenchengladbach',
+            'Mönchengladbach',
+            'Moenchengladbach',
+        ],
+        'DSC Arminia Bielefeld': ['Arminia Bielefeld', 'Bielefeld'],
+        'Eintracht Braunschweig': ['Braunschweig'],
+        'Eintracht Frankfurt': ['Frankfurt'],
+        'FC Augsburg': ['Augsburg'],
+        'FC Bayern München': ['Bayern München', 'Bayern Munich', 'FC Bayern Muenchen', 'Bayern'],
+        'FC Schalke 04': ['Schalke', 'Schalke 04', 'S04'],
+        'FC St. Pauli': ['St. Pauli', 'FC Sankt Pauli', 'Sankt Pauli'],
+        'Fortuna Düsseldorf': ['Düsseldorf', 'Duesseldorf', 'Dusseldorf'],
+        'Hamburger SV': ['HSV', 'Hamburg'],
+        'Hannover 96': ['Hannover'],
+        'Hertha BSC': ['Hertha Berlin', 'Hertha'],
+        'Holstein Kiel': ['Kiel'],
+        'Karlsruher SC': ['Karlsruhe', 'KSC'],
+        'RB Leipzig': ['RasenBallsport Leipzig', 'Leipzig'],
+        'SC Freiburg': ['Freiburg', 'Sport-Club Freiburg'],
+        'SC Paderborn 07': ['SC Paderborn', 'Paderborn'],
+        'SC Preußen Münster': ['Preußen Münster', 'Preussen Münster', 'Preussen Muenster', 'Münster', 'Muenster'],
+        'SG Dynamo Dresden': ['Dynamo Dresden', 'Dresden'],
+        'SpVgg Greuther Fürth': ['Greuther Fürth', 'Greuther Fuerth', 'Fürth', 'Fuerth'],
+        'SV Darmstadt 98': ['Darmstadt', 'Darmstadt 98'],
+        'SV Elversberg': ['Elversberg'],
+        'TSG Hoffenheim': ['1899 Hoffenheim', 'Hoffenheim'],
+        'VfB Stuttgart': ['Stuttgart'],
+        'VfL Bochum 1848': ['VfL Bochum', 'Bochum'],
+        'VfL Wolfsburg': ['Wolfsburg'],
+        'Werder Bremen': ['SV Werder Bremen', 'Bremen'],
+    },
+};

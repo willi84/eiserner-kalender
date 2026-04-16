@@ -1,6 +1,11 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
+import type { Spiel } from './events/events';
 import { getEvents } from './events/events';
-import { createLotteryExport } from './lottery/lottery';
+import { createLotteryExport, type LotteryCalendarDebugReport, type LotteryExport } from './lottery/lottery';
+import {
+    createTeamSynonymsOutputContent,
+    getTeamSynonymsOutputFile,
+} from './teams/team-synonyms/team-synonyms';
 
 type CalendarExport = {
     label: string;
@@ -10,6 +15,7 @@ type CalendarExport = {
 
 type ExportResult = {
     abgerufenAm: string;
+    calendarSpiele?: Spiel[];
     content: string;
     format: 'json' | 'ics';
     json: string;
@@ -44,6 +50,28 @@ const debugLog = (message: string, details?: Record<string, unknown>) => {
     }
 
     console.debug(`[debug][export] ${message}`);
+};
+
+const createDebugListItems = (items: string[]) => {
+    if (items.length === 0) {
+        return '          <li>Keine</li>';
+    }
+
+    return items.map((item) => `          <li>${item}</li>`).join('\n');
+};
+
+const createLotteryDebugConsoleOutput = (debug: LotteryCalendarDebugReport) => {
+    console.log('[debug][lottery] Kalenderabgleich abgeschlossen');
+    console.log(`[debug][lottery] Suchbegriffe: ${debug.searchTerms.join(', ') || 'keine konfiguriert'}`);
+    console.log(
+        `[debug][lottery] Erkannte Heimspiele aus Kalender: ${debug.recognizedCalendarGameCount}/${debug.calendarGameCount}`,
+    );
+    console.log(
+        `[debug][lottery] Fehlende Kalender-Spiele: ${debug.missingCalendarGames.join(', ') || 'keine'}`,
+    );
+    console.log(
+        `[debug][lottery] Spiele nicht im Kalender: ${debug.unmatchedLotteryGames.join(', ') || 'keine'}`,
+    );
 };
 
 const fetchIcs = async (url: string) => {
@@ -97,6 +125,7 @@ const exportCalendar = async ({ label, outputFile, url }: CalendarExport): Promi
 
     return {
         abgerufenAm,
+        calendarSpiele: events.spiele,
         content: json,
         format: 'json',
         json,
@@ -105,9 +134,7 @@ const exportCalendar = async ({ label, outputFile, url }: CalendarExport): Promi
     };
 };
 
-export const exportLottery = async (): Promise<ExportResult[]> => {
-    const lottery = await createLotteryExport();
-
+const createLotteryExportResults = (lottery: LotteryExport): ExportResult[] => {
     return [
         {
             abgerufenAm: lottery.abgerufenAm,
@@ -128,7 +155,21 @@ export const exportLottery = async (): Promise<ExportResult[]> => {
     ];
 };
 
-export const createIndexHtml = (exports: ExportResult[]) => {
+const createTeamSynonymExportResult = async (): Promise<ExportResult> => {
+    const content = createTeamSynonymsOutputContent();
+    const abgerufenAm = new Date().toISOString().slice(0, 10);
+
+    return {
+        abgerufenAm,
+        content,
+        format: 'json',
+        json: content,
+        label: 'Mannschafts-Synonyme',
+        outputFile: getTeamSynonymsOutputFile(),
+    };
+};
+
+export const createIndexHtml = (exports: ExportResult[], lotteryDebug: LotteryCalendarDebugReport) => {
     const listItems = exports
         .map(({ abgerufenAm, format, label, outputFile }) => {
             return `      <li><a href="./${outputFile}">${label}</a> <span>Format: ${format.toUpperCase()} | Erstellt am: ${abgerufenAm}</span></li>`;
@@ -149,6 +190,19 @@ export const createIndexHtml = (exports: ExportResult[]) => {
         '      <ul>',
         listItems,
         '      </ul>',
+        '      <section>',
+        '        <h2>Debug Kalenderabgleich Losverfahren</h2>',
+        `        <p>Suchbegriffe: ${lotteryDebug.searchTerms.join(', ') || 'keine konfiguriert'}</p>`,
+        `        <p>Erkannte Heimspiele aus Kalender: ${lotteryDebug.recognizedCalendarGameCount}/${lotteryDebug.calendarGameCount}</p>`,
+        '        <h3>Fehlende Kalender-Spiele</h3>',
+        '        <ul>',
+        createDebugListItems(lotteryDebug.missingCalendarGames),
+        '        </ul>',
+        '        <h3>Spiele nicht im Kalender</h3>',
+        '        <ul>',
+        createDebugListItems(lotteryDebug.unmatchedLotteryGames),
+        '        </ul>',
+        '      </section>',
         '    </main>',
         '  </body>',
         '</html>',
@@ -161,12 +215,19 @@ export const runExport = async () => {
     });
 
     const calendarExports = await Promise.all(CALENDARS.map(exportCalendar));
-    const lotteryExports = await exportLottery();
-    const exports = [...calendarExports, ...lotteryExports];
+    const menCalendarGames =
+        calendarExports
+            .find(({ outputFile }) => outputFile === 'unionspiele_maenner.json')
+            ?.calendarSpiele?.filter(({ spielort }) => spielort === 'heim') ?? [];
+    const lottery = createLotteryExport(menCalendarGames);
+    const lotteryExports = createLotteryExportResults(lottery);
+    const teamSynonymExport = await createTeamSynonymExportResult();
+    const exports = [...calendarExports, ...lotteryExports, teamSynonymExport];
 
     await removeLegacyOutputFiles();
     await Promise.all(exports.map(({ content, outputFile }) => writeOutputFile(outputFile, content)));
-    await writeOutputFile('index.html', createIndexHtml(exports));
+    await writeOutputFile('index.html', createIndexHtml(exports, lottery.debug));
+    createLotteryDebugConsoleOutput(lottery.debug);
 
     debugLog('Export run finished', {
         exportedFiles: exports.map(({ label, outputFile }) => ({ label, outputFile })),

@@ -1,4 +1,6 @@
+import type { Spiel } from '../events/events';
 import { createLotteryIcs } from './ical/ical';
+import { createLotteryCalendarDebugReport } from './lottery';
 import {
     extractArticleUrlsFromSearchResponse,
     extractTotalPagesFromSearchResponse,
@@ -22,13 +24,25 @@ describe('lottery parser', () => {
                         headline: 'Losverfahren startet am 19. Februar',
                         detailLink: '/de/meldungen/losverfahren-startet-am-19-februar-RgeVAU',
                     },
+                    {
+                        headline: 'Lostermine fuer das Heimspiel gegen Bremen',
+                        detailLink: '/de/meldungen/lostermine-fuer-das-heimspiel-gegen-bremen-ABCD12',
+                    },
+                    {
+                        headline: 'Losbuchungen fuer Mitglieder gestartet',
+                        detailLink: '/de/meldungen/losbuchungen-fuer-mitglieder-gestartet-EFGH34',
+                    },
                 ],
             },
         });
 
-        expect(extractArticleUrlsFromSearchResponse(response)).toEqual([
+        expect(
+            extractArticleUrlsFromSearchResponse(response, ['losverfahren', 'lostermine', 'losbuchungen']),
+        ).toEqual([
             'https://www.fc-union-berlin.de/de/meldungen/losverfahren-zu-den-heimspielen-gegen-koeln-und-augsburg-PcNWYI',
             'https://www.fc-union-berlin.de/de/meldungen/losverfahren-startet-am-19-februar-RgeVAU',
+            'https://www.fc-union-berlin.de/de/meldungen/lostermine-fuer-das-heimspiel-gegen-bremen-ABCD12',
+            'https://www.fc-union-berlin.de/de/meldungen/losbuchungen-fuer-mitglieder-gestartet-EFGH34',
         ]);
     });
 
@@ -40,6 +54,70 @@ describe('lottery parser', () => {
         });
 
         expect(extractTotalPagesFromSearchResponse(response)).toBe(809);
+    });
+
+    it('normalizes opponent aliases from lottery articles to the canonical team name', () => {
+        const articleHtml = `
+            <article>
+                <div class="richtext-table">
+                    <p><strong>1. FC Union Berlin vs. 1. FC Koeln</strong></p>
+                    <ul>
+                        <li>
+                            <p><strong>Losbuchung</strong><br>Fr | 20.03.2026 | 10 Uhr bis Mo | 23.03.2026 | 09 Uhr</p>
+                        </li>
+                    </ul>
+                </div>
+            </article>
+        `;
+
+        expect(parseLotteryArticle('https://example.com/article', articleHtml)).toEqual([
+            {
+                articleUrl: 'https://example.com/article',
+                opponent: '1. FC Köln',
+                partie: '1. FC Union Berlin vs. 1. FC Koeln',
+                updatedAt: null,
+                events: [
+                    {
+                        type: 'losbuchung',
+                        startsAt: '2026-03-20T10:00:00',
+                        endsAt: '2026-03-23T09:00:00',
+                        summary: '⚽️🎲 Losbuchung: 1. FC Köln',
+                    },
+                ],
+            },
+        ]);
+    });
+
+    it('normalizes additional second division aliases from lottery articles', () => {
+        const articleHtml = `
+            <article>
+                <div class="richtext-table">
+                    <p><strong>1. FC Union Berlin vs. Hertha Berlin</strong></p>
+                    <ul>
+                        <li>
+                            <p><strong>Losbuchung</strong><br>Fr | 20.03.2026 | 10 Uhr bis Mo | 23.03.2026 | 09 Uhr</p>
+                        </li>
+                    </ul>
+                </div>
+            </article>
+        `;
+
+        expect(parseLotteryArticle('https://example.com/article', articleHtml)).toEqual([
+            {
+                articleUrl: 'https://example.com/article',
+                opponent: 'Hertha BSC',
+                partie: '1. FC Union Berlin vs. Hertha Berlin',
+                updatedAt: null,
+                events: [
+                    {
+                        type: 'losbuchung',
+                        startsAt: '2026-03-20T10:00:00',
+                        endsAt: '2026-03-23T09:00:00',
+                        summary: '⚽️🎲 Losbuchung: Hertha BSC',
+                    },
+                ],
+            },
+        ]);
     });
 
     it('parses multiple lottery windows from an article', () => {
@@ -113,6 +191,94 @@ describe('lottery parser', () => {
                 ],
             },
         ]);
+    });
+});
+
+describe('createLotteryCalendarDebugReport()', () => {
+    it('compares lottery opponents against home games from the calendar', () => {
+        const calendarGames: Spiel[] = [
+            {
+                anstoss: '2026-03-20T15:30:00+01:00',
+                datum: '2026-03-20',
+                gegner: 'FC St. Pauli',
+                isoWeekYear: 2026,
+                kalenderwoche: 12,
+                spielort: 'heim',
+            },
+            {
+                anstoss: '2026-04-08T15:30:00+01:00',
+                datum: '2026-04-08',
+                gegner: 'VfL Wolfsburg',
+                isoWeekYear: 2026,
+                kalenderwoche: 15,
+                spielort: 'heim',
+            },
+            {
+                anstoss: '2026-04-20T15:30:00+01:00',
+                datum: '2026-04-20',
+                gegner: '1. FC Köln',
+                isoWeekYear: 2026,
+                kalenderwoche: 17,
+                spielort: 'heim',
+            },
+        ];
+        const searchTerms = ['losverfahren', 'lostermine'];
+
+        expect(
+            createLotteryCalendarDebugReport(
+                calendarGames,
+                [
+                    {
+                        articleUrl: 'https://example.com/article-1',
+                        endsAt: '2026-03-23T09:00:00',
+                        opponent: 'FC St. Pauli',
+                        partie: '1. FC Union Berlin vs. FC St. Pauli',
+                        startsAt: '2026-03-20T10:00:00',
+                        summary: '⚽️🎲 Losbuchung: FC St. Pauli',
+                        type: 'losbuchung',
+                        updatedAt: '2026-04-16T08:30:00.000Z',
+                    },
+                    {
+                        articleUrl: 'https://example.com/article-2',
+                        endsAt: '2026-04-09T17:00:00',
+                        opponent: 'VfL Wolfsburg',
+                        partie: '1. FC Union Berlin vs. VfL Wolfsburg',
+                        startsAt: '2026-04-08T10:00:00',
+                        summary: '⚽️ Verkauf Losgewinner: VfL Wolfsburg',
+                        type: 'losgewinnerverkauf',
+                        updatedAt: '2026-04-16T08:30:00.000Z',
+                    },
+                    {
+                        articleUrl: 'https://example.com/article-3',
+                        endsAt: '2026-04-10T17:00:00',
+                        opponent: '1. FC Koeln',
+                        partie: '1. FC Union Berlin vs. 1. FC Koeln',
+                        startsAt: '2026-04-09T10:00:00',
+                        summary: '⚽️🎲 Losbuchung: 1. FC Koeln',
+                        type: 'losbuchung',
+                        updatedAt: '2026-04-16T08:30:00.000Z',
+                    },
+                    {
+                        articleUrl: 'https://example.com/article-4',
+                        endsAt: '2026-05-10T17:00:00',
+                        opponent: 'RB Leipzig',
+                        partie: '1. FC Union Berlin vs. RB Leipzig',
+                        startsAt: '2026-05-09T10:00:00',
+                        summary: '⚽️🎲 Losbuchung: RB Leipzig',
+                        type: 'losbuchung',
+                        updatedAt: '2026-04-16T08:30:00.000Z',
+                    },
+                ],
+                searchTerms,
+            ),
+        ).toEqual({
+            calendarGameCount: 3,
+            missingCalendarGames: [],
+            recognizedCalendarGameCount: 3,
+            recognizedCalendarGames: ['1. FC Köln', 'FC St. Pauli', 'VfL Wolfsburg'],
+            searchTerms,
+            unmatchedLotteryGames: ['RB Leipzig'],
+        });
     });
 });
 
