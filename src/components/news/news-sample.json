@@ -1,0 +1,261 @@
+{
+  "success": true,
+  "data": {
+    "news": [
+      {
+        "id": 18035,
+        "sortDate": "2026-04-16T10:00:00.000Z",
+        "headline": "Traditionself startet in die Sommertour 2026",
+        "subHeadline": "Eiserne Legenden:",
+        "teaserText": "Die Sommertour 2026 des Traditionsteams des 1. FC Union Berlin wirft ihre Schatten voraus. Mit einem ungewöhnlichen Auftakt beginnt am Freitag, dem 01.05. die Tour auf der Trabrennbahn Berlin-Karlshorst. ",
+        "image": {
+          "baseUrl": "/image/ead926c3-aff9-4042-ad3c-e14414cd4cd6?ts=1776262494&s=UuK5ylGKyNBRPxmIkJ_QfS",
+          "width": 1920,
+          "height": 1152,
+          "caption": null,
+          "altText": "Zwei Fußballspieler kämpfen um den Ball auf einem grünen Platz unter Flutlicht.",
+          "copyright": null,
+          "focalPoint": null,
+          "alignment": null
+        },
+        "category": {
+          "id": "e6e35463-d6d1-4a43-ac85-bc6769cbea48",
+          "name": "Verein"
+        },
+        "tags": [
+          {
+            "id": "8afbce32-cadb-459e-bbc0-641991112eb4",
+            "name": "Traditionsmannschaft"
+          }
+        ],
+        "detailLink": "/de/meldungen/traditionself-startet-in-die-sommertour-2026-VZXw4X"
+      },
+      {
+        "id": 18037,
+        "sortDate": "2026-04-16T08:30:00.000Z",
+        "headline": "Losverfahren zu den Heimspielen gegen Köln und Augsburg",
+        "subHeadline": "Saisonendspurt:",
+        "teaserText": "Für die Profimannschaft der Männer des 1. FC Union Berlin stehen im Mai noch zwei Heimspieltermine an. Am 32. Spieltag empfängt das Team von Marie-Louise Eta den 1. FC Köln und am Sonnabend, dem 16.05.2026, wird der FC Augsburg in Köpenick erwartet.",
+        "image": {
+          "baseUrl": "/image/3fc6517c-1886-47d9-8444-9bd5b27db765?ts=1759132350&s=nM8mVPIecsLX5hN4w56v1q",
+          "width": 1920,
+          "height": 1152,
+          "caption": null,
+          "altText": "Eine große Menschenmenge im Stadion schwenkt rote und weiße Schals und zeigt Begeisterung während eines Spiels.",
+          "copyright": null,
+          "focalPoint": null,
+          "alignment": null
+        },
+        "category": {
+          "id": "56cbb28f-0a2c-496d-8600-ec5fb6a306cc",
+          "name": "Fans"
+        },
+        "tags": [
+          {
+            "id": "52280bdc-0134-4fe4-b17a-347932d3c3c4",
+            "name": "Profis Männer"
+          },
+          {
+            "id": "84f5d0be-610a-46f5-8c85-09208cab96b4",
+            "name": "Saison 2025/26"
+          },
+          {
+            "id": "a6da212f-30a4-4207-a167-337d297776aa",
+            "name": "25/26-M-32-FCUKOE"
+          },
+          {
+            "id": "03b511ad-e337-4ef6-92a7-69d14e58dafa",
+            "name": "25/26-M-34-FCUFCA"
+          }
+        ],
+        "detailLink": "/de/meldungen/losverfahren-zu-den-heimspielen-gegen-koeln-und-augsburg-PcNWYI"
+      },
+      {
+        "id": 180373434,
+        "sortDate": "2026-04-16T08:30:00.000Z",
+        "headline": "LosBuchung zu den Heimspielen",
+        "subHeadline": "Saisonendspurt:",
+        "teaserText": "Für die Profimannschaft der Männer des 1. FC Union Berlin stehen im Mai noch zwei Heimspieltermine an. Am 32. Spieltag empfängt das Team von Marie-Louise Eta den 1. FC Köln und am Sonnabend, dem 16.05.2026, wird der FC Augsburg in Köpenick erwartet.",
+        "image": {
+          "baseUrl": "/image/3fc6517c-1886-47d9-8444-9bd5b27db765?ts=1759132350&s=nM8mVPIecsLX5hN4w56v1q",
+          "width": 1920,
+          "height": 1152,
+          "caption": null,
+          "altText": "Eine große Menschenmenge im Stadion schwenkt rote und weiße Schals und zeigt Begeisterung während eines Spiels.",
+          "copyright": null,
+          "focalPoint": null,
+          "alignment": null
+        },
+        "category": {
+          "id": "56cbb28f-0a2c-496d-8600-ec5fb6a306cc",
+          "name": "Fans"
+        },
+        "tags": [
+          {
+            "id": "52280bdc-0134-4fe4-b17a-347932d3c3c4",
+            "name": "Profis Männer"
+          },
+          {
+            "id": "84f5d0be-610a-46f5-8c85-09208cab96b4",
+            "name": "Saison 2025/26"
+          },
+          {
+            "id": "a6da212f-30a4-4207-a167-337d297776aa",
+            "name": "25/26-M-32-FCUKOE"
+          },
+          {
+            "id": "03b511ad-e337-4ef6-92a7-69d14e58dafa",
+            "name": "25/26-M-34-FCUFCA"
+          }
+        ],
+        "detailLink": "/de/meldungen/losbuchung-zu-den-heimspielen"
+      },
+      {
+        "id": 18036,
+        "sortDate": "2026-04-15T19:38:00.000Z",
+        "headline": "U19 besiegt Hertha in der Alten Försterei ",
+        "subHeadline": "Einzug ins Pokalfinale:  ",
+        "teaserText": "Im Halbfinale des diesjährigen Berlin-Pokals setzen sich die A-Junioren des 1. FC Union Berlin souverän mit 4:2 (3:0) gegen den Stadtrivalen Hertha BSC durch und ziehen nach einer dominanten Vorstellung verdient ins Finale ein. Von Beginn an übernahmen die Eisernen die Kontrolle über das Spielgeschehen und legten bereits in der ersten Halbzeit den Grundstein für den späteren Erfolg. ",
+        "image": {
+          "baseUrl": "/image/d6dd0062-8a48-46eb-a72f-20a7b8cc9716?ts=1776281207&s=0NZ4RVBBMlEP6uY6l8y27f",
+          "width": 1920,
+          "height": 1152,
+          "caption": null,
+          "altText": "Fußballspieler feiern ein Tor auf dem Spielfeld, während gegnerische Spieler im Hintergrund stehen.",
+          "copyright": null,
+          "focalPoint": null,
+          "alignment": null
+        },
+        "category": {
+          "id": "1870e135-4ad9-42e0-9c4b-ab336030962a",
+          "name": "Nachwuchs"
+        },
+        "tags": [
+          {
+            "id": "97444a16-fb87-4226-82c6-67159a3454e9",
+            "name": "Nachwuchs"
+          },
+          {
+            "id": "84f5d0be-610a-46f5-8c85-09208cab96b4",
+            "name": "Saison 2025/26"
+          },
+          {
+            "id": "597819b9-d6be-48d4-9be2-d112817e2e0b",
+            "name": "U19 Junioren"
+          }
+        ],
+        "detailLink": "/de/meldungen/u19-besiegt-hertha-in-der-alten-foersterei-RgeVsG"
+      },
+      {
+        "id": 17770,
+        "sortDate": "2026-04-15T12:00:00.000Z",
+        "headline": "Unionerinnen im Nachbarschaftsduell mit Potsdam",
+        "subHeadline": "Zweiter Test der Länderspielpause:",
+        "teaserText": "Nach dem Test gegen Hertha BSC haben die Frauen des 1. FC Union Berlin am Freitag, dem 17.04.2026, das nächste Testspiel mit Derby-Charakter vor der Brust: Sie gastieren beim 1. FFC Turbine Potsdam. Anpfiff im Sportforum Waldstadt ist um 16 Uhr.",
+        "image": {
+          "baseUrl": "/image/11faa0fb-ce09-4650-9363-a48235f78ca8?ts=1776180933&s=V0BPmhTjIkIu9t9J5ddD0J",
+          "width": 1920,
+          "height": 1152,
+          "caption": null,
+          "altText": "Spielerin in schwarzer Fußballausrüstung mit \"raisin\"-Logo läuft auf dem Spielfeld, im Hintergrund Werbebanner.",
+          "copyright": null,
+          "focalPoint": null,
+          "alignment": null
+        },
+        "category": {
+          "id": "f3473899-108c-4761-9cac-e79e426444ac",
+          "name": "Profis Frauen"
+        },
+        "tags": [
+          {
+            "id": "b7612285-c2b3-4b62-9904-f0a118ff5e05",
+            "name": "Profis Frauen"
+          },
+          {
+            "id": "84f5d0be-610a-46f5-8c85-09208cab96b4",
+            "name": "Saison 2025/26"
+          },
+          {
+            "id": "f4241f23-8b91-4401-a030-edf75e28795c",
+            "name": "Frauen Testspiele"
+          }
+        ],
+        "detailLink": "/de/meldungen/zweiter-test-der-laenderspielpause-unionerinnen-im-nachbarschaftsduell-mit-potsdam--6VgFMw"
+      },
+      {
+        "id": 18034,
+        "sortDate": "2026-04-15T11:37:00.000Z",
+        "headline": " Bachparty der Union-Stiftung ",
+        "subHeadline": "Danke an die fleißigen Helfer:",
+        "teaserText": "Am vergangenem Sonnabend kamen auf Einladung der Stiftung „UNION VEREINT. Schulter an Schulter“ wieder zahlreiche Unioner zusammen, um gemeinsam anzupacken und rund um die Wuhle für Ordnung zu sorgen.",
+        "image": {
+          "baseUrl": "/image/97f56faf-28f0-4441-8d62-548f6c39c887?ts=1776253009&s=OiGrs855z3Dacm7j_kGKfh",
+          "width": 1920,
+          "height": 1141,
+          "caption": null,
+          "altText": "Eine Gruppe von Menschen in roten und schwarzen Kleidern steht vor dem Stadion an der Alten Försterei. Im Hintergrund ist das Stadion sichtbar.",
+          "copyright": null,
+          "focalPoint": null,
+          "alignment": null
+        },
+        "category": {
+          "id": "56cbb28f-0a2c-496d-8600-ec5fb6a306cc",
+          "name": "Fans"
+        },
+        "tags": [
+          {
+            "id": "2273b742-008c-4027-bb71-0412b1f64f42",
+            "name": "Fans"
+          },
+          {
+            "id": "84f5d0be-610a-46f5-8c85-09208cab96b4",
+            "name": "Saison 2025/26"
+          },
+          {
+            "id": "e9cad734-20aa-4913-ac3d-7fce0ddcfd23",
+            "name": "Union-Stiftung"
+          }
+        ],
+        "detailLink": "/de/meldungen/bachparty-der-union-stiftung-Nuz8My"
+      },
+      {
+        "id": 18016,
+        "sortDate": "2026-04-10T10:00:00.000Z",
+        "headline": "Unionerinnen zu Gast bei Turbine Potsdam",
+        "subHeadline": "Zweiter Test im April:",
+        "teaserText": "Die Profimannschaft der Frauen des 1. FC Union Berlin nutzt die dreieinhalbwöchige Liga-Pause für einen zweiten Testlauf. Nach dem gestrigen Stadtduell bei Hertha BSC wird am kommenden Freitag, dem 17.04.2026, gegen den Zweitligisten 1. FFC Turbine Potsdam getestet. Der Anpfiff im Sportforum Waldstadt erfolgt um 16 Uhr.",
+        "image": {
+          "baseUrl": "/image/019dbb4c-9863-4844-b397-248efb19dd62?ts=1775807841&s=UN2P5aRxMxau9hKO51pOgX",
+          "width": 1920,
+          "height": 1152,
+          "caption": null,
+          "altText": null,
+          "copyright": null,
+          "focalPoint": null,
+          "alignment": null
+        },
+        "category": {
+          "id": "f3473899-108c-4761-9cac-e79e426444ac",
+          "name": "Profis Frauen"
+        },
+        "tags": [
+          {
+            "id": "b7612285-c2b3-4b62-9904-f0a118ff5e05",
+            "name": "Profis Frauen"
+          },
+          {
+            "id": "84f5d0be-610a-46f5-8c85-09208cab96b4",
+            "name": "Saison 2025/26"
+          },
+          {
+            "id": "f4241f23-8b91-4401-a030-edf75e28795c",
+            "name": "Frauen Testspiele"
+          }
+        ],
+        "detailLink": "/de/meldungen/zweiter-test-im-april-unionerinnen-zu-gast-bei-turbine-potsdam-86RbAy"
+      }
+    ],
+    "totalItems": 16176,
+    "totalPages": 809
+  }
+}

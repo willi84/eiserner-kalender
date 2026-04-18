@@ -12,13 +12,16 @@ module.exports = {
       ],
     },
     moduleNameMapper: {
+      "^@_shared/(.*)$": "<rootDir>/src/_shared/$1",
+      "^@component/(.*)$": "<rootDir>/src/components/$1",
+      "^@config/(.*)$": "<rootDir>/src/config/$1",
+      "^@apps/(.*)$": "<rootDir>/src/apps/$1",
       '^image![a-zA-Z0-9$_-]+$': 'GlobalImageStub',
       '^[./a-zA-Z0-9$_-]+\\.png$': '<rootDir>/RelativeImageStub.js',
       'module_name_(.*)': '<rootDir>/substituted_module_$1.js',
       'assets/(.*)': [
         '<rootDir>/images/$1',
         '<rootDir>/photos/$1',
-        '<rootDir>/recipes/$1',
       ],
     },
     testEnvironment: 'jsdom',

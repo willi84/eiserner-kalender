@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Eiserner Kalender Export</title>
+    <style>
+      :root {
+        --union-red: #e30613;
+        --union-red-dark: #d0021b;
+        --union-white: #ffffff;
+        --union-ice: #f6f3f0;
+        --union-line: #e4d8d1;
+        --union-text: #201717;
+        --union-shadow: 0 18px 50px rgba(143, 0, 18, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Courier New", "Lucida Console", monospace;
+        color: var(--union-text);
+        background:
+          linear-gradient(180deg, rgba(208, 2, 27, 0.1), rgba(208, 2, 27, 0) 28rem),
+          linear-gradient(135deg, #fffdfb, var(--union-ice));
+      }
+
+      a {
+        color: inherit;
+      }
+
+      main {
+        width: min(1120px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 2rem 0 3rem;
+      }
+
+      .hero,
+      .debug {
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--union-line);
+        box-shadow: var(--union-shadow);
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto -4rem -4rem auto;
+        width: 14rem;
+        height: 14rem;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(208, 2, 27, 0.14), rgba(208, 2, 27, 0));
+        pointer-events: none;
+      }
+
+      .hero-top {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .hero-top > svg,
+      .logo {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .eyebrow {
+        margin: 0 0 0.35rem;
+        color: var(--union-red-dark);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(1.8rem, 5vw, 3rem);
+        line-height: 1;
+        text-transform: uppercase;
+      }
+
+      .hero-copy {
+        margin: 0.75rem 0 0;
+        max-width: 42rem;
+        color: #4e3b3b;
+        line-height: 1.6;
+      }
+
+      .file-grid {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0 0;
+        padding: 0;
+      }
+
+      .file-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        min-height: 100%;
+        padding: 1rem;
+        border-radius: 1rem;
+        border: 1px solid var(--union-line);
+        background:
+          linear-gradient(180deg, rgba(208, 2, 27, 0.06), rgba(255, 255, 255, 0.96)),
+          var(--union-white);
+      }
+
+      .file-card strong {
+        font-size: 1rem;
+        text-transform: uppercase;
+      }
+
+      .file-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.78rem;
+        color: var(--union-red-dark);
+        text-transform: uppercase;
+      }
+
+      .file-name {
+        margin: 0;
+        color: #655353;
+        font-size: 0.92rem;
+        word-break: break-word;
+      }
+
+      .file-link {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+        padding: 0.72rem 1rem;
+        border-radius: 999px;
+        text-decoration: none;
+        color: var(--union-white);
+        background: linear-gradient(135deg, var(--union-red), var(--union-red-dark));
+      }
+
+      .debug {
+        margin-top: 1.5rem;
+        border-radius: 1.25rem;
+        padding: 0;
+      }
+
+      .debug-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.25rem;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .debug-summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .debug-summary::after {
+        content: "Aufklappen";
+        flex-shrink: 0;
+        padding: 0.4rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid var(--union-line);
+        color: var(--union-red-dark);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+      }
+
+      .debug[open] .debug-summary::after {
+        content: "Zuklappen";
+      }
+
+      .debug h2 {
+        font-size: 1.1rem;
+        text-transform: uppercase;
+      }
+
+      .debug-body {
+        padding: 0 1.25rem 1.25rem;
+      }
+
+      .debug-copy {
+        margin: 0.9rem 0 0;
+        color: #574545;
+        line-height: 1.6;
+      }
+
+      .debug-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.9rem;
+        margin-top: 1rem;
+      }
+
+      .debug-card {
+        padding: 0.95rem 1rem;
+        border-radius: 1rem;
+        border: 1px solid var(--union-line);
+        background: var(--union-white);
+      }
+
+      .debug-card h3 {
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        color: var(--union-red-dark);
+      }
+
+      .debug-card p,
+      .debug-card ul {
+        margin: 0.6rem 0 0;
+        line-height: 1.55;
+      }
+
+      .debug-card ul {
+        padding-left: 1.1rem;
+      }
+
+      @media (max-width: 640px) {
+        main {
+          width: min(100% - 1rem, 1120px);
+          padding-top: 0.5rem;
+        }
+
+        .hero,
+        .debug {
+          border-radius: 1rem;
+        }
+
+        .hero-top {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .file-link {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <div class="hero-top">
+          {logo}
+          <div>
+            <p class="eyebrow">Eiserner Kalender</p>
+            <h1>Kalender & Exporte</h1>
+            <p class="hero-copy">
+              Hier befinden sich experimentelle Kalenderfunktionen und Exportmöglichkeiten.
+            </p>
+          </div>
+        </div>
+        <ul class="file-grid">
+        {listItems}
+        </ul>
+      </section>
+      <details class="debug">
+        <summary class="debug-summary">
+          <h2>Debug Kalenderabgleich Losverfahren</h2>
+        </summary>
+        <div class="debug-body">
+          <p class="debug-copy">Suchbegriffe: {searchTerms}</p>
+          <div class="debug-grid">
+            <article class="debug-card">
+              <h3>Status</h3>
+              <p>Erkannte Heimspiele aus Kalender: {recognizedCalendarGameCount}/{calendarGameCount}</p>
+            </article>
+            <article class="debug-card">
+              <h3>Fehlende Kalender-Spiele</h3>
+              <ul>
+                <li>{missingCalendarGames}</li>
+              </ul>
+            </article>
+            <article class="debug-card">
+              <h3>Spiele nicht im Kalender</h3>
+              <ul>
+                <li>{unmatchedLotteryGames}</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </details>
+    </main>
+  </body>
+</html>

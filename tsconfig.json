@@ -3,6 +3,13 @@
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["node", "@types/jest"],
+    "baseUrl": "./src",
+    "paths": {
+      "@_shared/*": ["_shared/*"],
+      "@component/*": ["components/*"],
+      "@config/*": ["config/*"],
+      "@apps/*": ["apps/*"]
+    },
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,

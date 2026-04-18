@@ -4,7 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "tsx src/index.ts",
-    "export-json": "tsx src/index.ts",
+    "build": "tsx src/index.ts",
+    "export-json": "tsx src/index.ts --live",
     "test": "jest --env=jsdom --coverage --runInBand"
   },
   "repository": {
@@ -25,8 +26,10 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/mock-fs": "^4.13.4",
     "@types/node": "^25.6.0",
     "jest-environment-jsdom": "^29.6.2",
+    "mock-fs": "^5.5.0",
     "ts-jest": "^29.1.1"
   }
 }

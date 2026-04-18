@@ -1,0 +1,1 @@
+export type KEY_VALUES = { [key: string]: string | number | boolean };

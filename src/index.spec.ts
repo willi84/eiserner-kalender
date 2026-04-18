@@ -1,11 +1,11 @@
-import { createIndexHtml } from './index';
+import { createIndexHtml, ExportResult } from './index';
 
 describe('createIndexHtml()', () => {
-    it('renders links, creation dates and the lottery debug summary', () => {
+    it('renders file cards, logo usage and the lottery debug summary', () => {
         const html = createIndexHtml(
             [
                 {
-                    abgerufenAm: '2026-04-12',
+                    updatedAt: '2026-04-12',
                     content: '{}',
                     format: 'json',
                     json: '{}',
@@ -13,7 +13,7 @@ describe('createIndexHtml()', () => {
                     outputFile: 'unionspiele_maenner.json',
                 },
                 {
-                    abgerufenAm: '2026-04-12',
+                    updatedAt: '2026-04-12',
                     content: 'BEGIN:VCALENDAR',
                     format: 'ics',
                     json: '{}',
@@ -21,7 +21,7 @@ describe('createIndexHtml()', () => {
                     outputFile: 'union_lottery.ics',
                 },
                 {
-                    abgerufenAm: '2026-04-12',
+                    updatedAt: '2026-04-12',
                     content: '{}',
                     format: 'json',
                     json: '{}',
@@ -39,15 +39,50 @@ describe('createIndexHtml()', () => {
             },
         );
 
+        expect(html).toContain('./assets/logo.svg');
+        expect(html).toContain('class="file-grid"');
+        expect(html).toContain('class="file-card"');
         expect(html).toContain('./unionspiele_maenner.json');
         expect(html).toContain('./union_lottery.ics');
         expect(html).toContain('./team-synonyms.json');
         expect(html).toContain('Format: JSON');
         expect(html).toContain('Format: ICS');
         expect(html).toContain('Erstellt am: 2026-04-12');
+        expect(html).toContain('Datei öffnen');
         expect(html).toContain('Debug Kalenderabgleich Losverfahren');
         expect(html).toContain('Erkannte Heimspiele aus Kalender: 2/3');
         expect(html).toContain('1. FC Köln');
         expect(html).toContain('RB Leipzig');
+    });
+
+    it('renders the final html with the new layout shell', () => {
+        const EXPORTS: ExportResult[] = [
+            {
+                updatedAt: '2026-04-12',
+                content: '{}',
+                format: 'json',
+                json: '{}',
+                label: 'Männer',
+                outputFile: 'unionspiele_maenner.json',
+            },
+        ];
+        const LOTTERY_DEBUG = {
+            calendarGameCount: 3,
+            missingCalendarGames: ['1. FC Köln'],
+            recognizedCalendarGameCount: 2,
+            recognizedCalendarGames: ['FC St. Pauli', 'VfL Wolfsburg'],
+            searchTerms: ['losverfahren', 'lostermine'],
+            unmatchedLotteryGames: ['RB Leipzig'],
+        };
+
+        const result = createIndexHtml(EXPORTS, LOTTERY_DEBUG);
+
+        expect(result).toContain('<section class="hero">');
+        expect(result).toContain('<h1>Dateien & Exporte</h1>');
+        expect(result).toContain('<strong>Männer</strong>');
+        expect(result).toContain('<p class="file-name">unionspiele_maenner.json</p>');
+        expect(result).toContain('<section class="debug">');
+        expect(result).toContain('<h3>Status</h3>');
+        expect(result).toContain('Suchbegriffe: losverfahren, lostermine');
     });
 });

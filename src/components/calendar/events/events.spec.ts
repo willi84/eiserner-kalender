@@ -1,12 +1,14 @@
-import { readFileSync } from 'node:fs';
+
+import { FS } from '@_shared/fs/fs';
 import { getEvents } from './events';
+import { BASE_ICAL } from '@config/endpoints';
 
 describe('getEvents()', () => {
-    const url = 'https://kalender.textilvergehen.de/unionspiele_maenner.ics';
+    const url = `${BASE_ICAL}unionspiele_maenner.ics`;
     const abgerufenAm = '2026-04-12';
 
     it('should return parsed event data from the ics file', () => {
-        const mockedIcs = readFileSync('src/events/events.ics', 'utf8');
+        const mockedIcs: string = FS.readFile('src/components/calendar/events/events.ics') || '';
 
         expect(getEvents(url, mockedIcs, abgerufenAm)).toEqual({
             verein: '1. FC Union Berlin',

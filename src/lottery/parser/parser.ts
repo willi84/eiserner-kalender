@@ -1,88 +1,19 @@
 import { parse } from 'node-html-parser';
 import { getCanonicalTeamName } from '../../teams/team-synonyms/team-synonyms';
+import type { LotteryArticle, LotteryArticleEvent } from './parser.d';
+import { normalizeWhitespace } from '@_shared/sanitize/sanitize';
+import { matchesSearchTerms } from '@component/news/news';
 
-type LotteryEventType = 'losbuchung' | 'losgewinnerverkauf';
 
-type LotterySearchItem = {
-    detailLink: string;
-    headline: string;
-};
+const PARTIE_PATTERN = /^(.+)\s+vs\.?\s*(.+)$/i;
+const LOSBUCHUNG_LABELS = ['Losbuchung', 'Platzkarte Losbuchung'];
+const LOSGEWINNER_LABELS = ['Losgewinner', 'Platzkarte Losgewinner', 'Gewinner', 'Gewinnerverkauf'];
 
-type LotterySearchResponse = {
-    data?: {
-        news?: LotterySearchItem[];
-        totalPages?: number;
-    };
-};
-
-export type LotteryArticle = {
-    opponent: string;
-    articleUrl: string;
-    partie: string;
-    updatedAt: string | null;
-    events: LotteryArticleEvent[];
-};
-
-export type LotteryArticleEvent = {
-    type: LotteryEventType;
-    startsAt: string;
-    endsAt: string;
-    summary: string;
-};
-
-const ARTICLE_BASE_URL = 'https://www.fc-union-berlin.de';
-const OPPONENT_PATTERN = /^1\.\s*FC Union Berlin\s+vs\.?\s*(.+)$/i;
-const PARTIE_PATTERN = /^1\.\s*FC Union Berlin\s+vs\.?\s*.+$/i;
-const LOSBUCHUNG_LABEL = 'Losbuchung';
-const LOSGEWINNER_LABEL = 'Platzkarte Losgewinner';
-const MULTIPLE_NEWLINES_PATTERN = /\n{2,}/g;
-const MULTIPLE_SPACES_PATTERN = /[ \t]{2,}/g;
-
-const decodeHtml = (value: string) => {
-    return value
-        .replace(/&nbsp;/g, ' ')
-        .replace(/&amp;/g, '&')
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&apos;/g, "'")
-        .replace(/&uuml;/g, 'ü')
-        .replace(/&Uuml;/g, 'Ü')
-        .replace(/&ouml;/g, 'ö')
-        .replace(/&Ouml;/g, 'Ö')
-        .replace(/&auml;/g, 'ä')
-        .replace(/&Auml;/g, 'Ä')
-        .replace(/&szlig;/g, 'ß');
-};
-
-const normalizeWhitespace = (value: string) => {
-    return value
-        .replace(/\r/g, '')
-        .replace(MULTIPLE_SPACES_PATTERN, ' ')
-        .replace(MULTIPLE_NEWLINES_PATTERN, '\n')
-        .split('\n')
-        .map((line) => decodeHtml(line).trim())
-        .filter(Boolean)
-        .join('\n');
-};
-
-const normalizeText = (value: string) => {
-    return value
-        .toLocaleLowerCase('de-DE')
-        .replace(/ä/g, 'ae')
-        .replace(/ö/g, 'oe')
-        .replace(/ü/g, 'ue')
-        .replace(/ß/g, 'ss');
-};
-
-const toAbsoluteUrl = (url: string) => new URL(url, ARTICLE_BASE_URL).toString();
-
-const unique = (values: string[]) => Array.from(new Set(values));
-
-const matchesSearchTerms = (headline: string, searchTerms: string[]) => {
-    const normalizedHeadline = normalizeText(headline);
-
-    return searchTerms.some((searchTerm) => normalizedHeadline.includes(normalizeText(searchTerm)));
-};
+const REGEX_DATES = [
+    /(\d{2}\.\d{2}\.\d{4})\s*\|\s*(\d{1,2})(?::(\d{2}))?\s*Uhr\s+bis\s+\S+\s*\|\s*(\d{2}\.\d{2}\.\d{4})\s*\|\s*(\d{1,2})(?::(\d{2}))?\s*Uhr/i, // 'Fr | 17.04.2026 | 10 Uhr bis Mo | 20.04.2026 | 09 Uhr'
+    /(\d{2}\.\d{2}\.\d{4})\s*(\d{1,2}):(\d{2})\s*-\s*(\d{2}\.\d{2}\.\d{4})\s*(\d{1,2}):(\d{2})/i, // '20.03.2026 10:00 - 23.03.2026 09:00'
+    /(\d{2}\.\d{2}\.\d{4})\s*\|\s*(\d{1,2}):(\d{2})\s*Uhr\s*bis\s*(\d{2}\.\d{2}\.\d{4})\s*\|\s*(\d{1,2}):(\d{2})\s*Uhr/i, // '20.03.2026 | 10:00 Uhr bis 23.03.2026 | 09:00 Uhr'
+]
 
 const findMatchingLines = (text: string, pattern: RegExp) => {
     return text
@@ -90,10 +21,12 @@ const findMatchingLines = (text: string, pattern: RegExp) => {
         .map((line) => line.trim())
         .filter((line) => pattern.test(line));
 };
-
-const parseGermanDateLine = (line: string) => {
+/**
+ * generic date matching function
+ */
+const matchDateRegex  = (line: string, regex: RegExp) => {
     const match = line.match(
-        /(\d{2}\.\d{2}\.\d{4})\s*\|\s*(\d{1,2})(?::(\d{2}))?\s*Uhr\s+bis\s+\S+\s*\|\s*(\d{2}\.\d{2}\.\d{4})\s*\|\s*(\d{1,2})(?::(\d{2}))?\s*Uhr/i,
+        regex,
     );
 
     if (!match) {
@@ -101,6 +34,24 @@ const parseGermanDateLine = (line: string) => {
     }
 
     const [, startDate, startHour, startMinute = '00', endDate, endHour, endMinute = '00'] = match;
+    return {
+        start: {
+            startDate, startHour, startMinute,
+        },
+        end: {
+            endDate, endHour, endMinute,
+        }
+    };
+};
+
+export const parseGermanDateLine = (line: string) => {
+    const parsed = REGEX_DATES.map((regex) => matchDateRegex(line, regex)).find((result) => result !== null);
+
+    if (!parsed) {
+        return null;
+    }
+    
+    const { start: { startDate, startHour, startMinute }, end: { endDate, endHour, endMinute } } = parsed;
 
     const toIso = (date: string, hour: string, minute: string) => {
         const [day, month, year] = date.split('.');
@@ -113,15 +64,7 @@ const parseGermanDateLine = (line: string) => {
     };
 };
 
-const createSummary = (type: LotteryEventType, opponent: string) => {
-    if (type === 'losbuchung') {
-        return `⚽️🎲 Losbuchung: ${opponent}`;
-    }
-
-    return `⚽️ Verkauf Losgewinner: ${opponent}`;
-};
-
-const extractEvent = (lines: string[], index: number, opponent: string) => {
+const extractEvent = (lines: string[], index: number) => {
     const label = lines[index];
     const dateLine = lines[index + 1] ?? '';
     const parsedDateLine = parseGermanDateLine(dateLine);
@@ -130,28 +73,13 @@ const extractEvent = (lines: string[], index: number, opponent: string) => {
         return null;
     }
 
-    const type = label === LOSBUCHUNG_LABEL ? 'losbuchung' : 'losgewinnerverkauf';
+    const type = matchesSearchTerms(label, LOSBUCHUNG_LABELS) ? 'losbuchung' : matchesSearchTerms(label, LOSGEWINNER_LABELS) ? 'losgewinnerverkauf' : 'unknown';
 
     return {
         type,
         startsAt: parsedDateLine.startsAt,
         endsAt: parsedDateLine.endsAt,
-        summary: createSummary(type, opponent),
     } satisfies LotteryArticleEvent;
-};
-
-export const extractArticleUrlsFromSearchResponse = (payload: string, searchTerms: string[]) => {
-    const response = JSON.parse(payload) as LotterySearchResponse;
-    const articleUrls = (response.data?.news ?? [])
-        .filter(({ headline }) => matchesSearchTerms(headline, searchTerms))
-        .map(({ detailLink }) => toAbsoluteUrl(detailLink));
-
-    return unique(articleUrls);
-};
-
-export const extractTotalPagesFromSearchResponse = (payload: string) => {
-    const response = JSON.parse(payload) as LotterySearchResponse;
-    return response.data?.totalPages ?? 1;
 };
 
 export const parseLotteryArticle = (articleUrl: string, html: string): LotteryArticle[] => {
@@ -159,12 +87,15 @@ export const parseLotteryArticle = (articleUrl: string, html: string): LotteryAr
     const content = root.querySelector('.richtext-table') ?? root.querySelector('article') ?? root;
     const text = normalizeWhitespace(content.structuredText);
     const lines = text.split('\n');
-    const updatedAt = root.querySelector('time')?.getAttribute('datetime') ?? null;
+    const updatedAt = root.querySelector('time')?.getAttribute('datetime') ?? null; // TODO
     const parties = findMatchingLines(text, PARTIE_PATTERN)
         .map((partie) => {
-            const match = partie.match(OPPONENT_PATTERN);
+            const teams = partie.split(/vs\.*/i).map((team) => team.trim());
+            const isHome = Boolean(teams[0].toLowerCase().match(/union\s*berlin\s*/i));
+            const opponent = isHome ? teams[1] : teams[0];
             return {
-                opponent: getCanonicalTeamName(match?.[1]?.trim() ?? ''),
+                opponent: getCanonicalTeamName(opponent),
+                isHome,
                 partie,
             };
         })
@@ -174,34 +105,34 @@ export const parseLotteryArticle = (articleUrl: string, html: string): LotteryAr
         return [];
     }
 
-    const articles = parties.map(({ opponent, partie }) => ({
+    const articles = parties.map(({ opponent, isHome }) => ({
         opponent,
         articleUrl,
-        partie,
+        isHome,
         updatedAt,
         events: [] as LotteryArticleEvent[],
     }));
 
-    let currentOpponentIndex = -1;
-
+    let matchIndex = -1;
+    const TYPE_LABELS = [...LOSGEWINNER_LABELS, ...LOSBUCHUNG_LABELS];
     lines.forEach((line, index) => {
+        // get index of current match
         if (PARTIE_PATTERN.test(line)) {
-            currentOpponentIndex += 1;
+            matchIndex += 1;
             return;
         }
 
-        if (currentOpponentIndex < 0) {
+        if (matchIndex < 0) {
             return;
         }
-
-        if (line !== LOSBUCHUNG_LABEL && line !== LOSGEWINNER_LABEL) {
+        if (matchesSearchTerms(line, TYPE_LABELS)) {
+            // use label as start
+            const event = extractEvent(lines, index);
+            if (event) {
+                articles[matchIndex].events.push(event);
+            }
+        } else {
             return;
-        }
-
-        const event = extractEvent(lines, index, articles[currentOpponentIndex].opponent);
-
-        if (event) {
-            articles[currentOpponentIndex].events.push(event);
         }
     });
 
