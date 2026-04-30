@@ -1,4 +1,4 @@
-import { getIsoWeek, toIsoDateTime } from './date';
+import { getIsoWeek, toIsoDateTime, toUtcIcalDateTime } from './date';
 
 describe('getIsoWeek()', () => {
     const FN = getIsoWeek;
@@ -23,5 +23,16 @@ describe('toIsoDateTime()', () => {
         expect(FN('DTSTART:20240615T193000')).toBe('2024-06-15T19:30:00Z');
         expect(FN('DTSTART;TZID="+02:00":20240615T193000')).toBe('2024-06-15T19:30:00+02:00');
         expect(FN('DTSTART;TZID=Europe/Berlin:20240615T193000')).toBe('2024-06-15T19:30:00');
+    });
+});
+describe('toUtcIcalDateTime()', () => {
+    const FN = toUtcIcalDateTime;
+
+    it('converts Berlin summer time to UTC for ICS export', () => {
+        expect(FN('2026-04-30T10:00:00', 'Europe/Berlin')).toBe('20260430T080000Z');
+    });
+
+    it('converts Berlin winter time to UTC for ICS export', () => {
+        expect(FN('2026-11-10T10:00:00', 'Europe/Berlin')).toBe('20261110T090000Z');
     });
 });

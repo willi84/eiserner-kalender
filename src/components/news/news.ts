@@ -16,9 +16,7 @@ export const matchesSearchTerms = (headline: string, searchTerms: string[]) => {
 };
 
 export const getNewsUrls = (searchTerms: string[], json: NewsResponse) => {
-    const keys = Object.keys(json);
-    if (!keys.includes('data') || !json.data || !json.data.news) {
-        LOG.FAIL(`Unexpected search response format: missing 'data.news' array`);
+    if (!Array.isArray(json?.data?.news)) {
         return [];
     }
     const newsUrls = json.data?.news
@@ -27,6 +25,7 @@ export const getNewsUrls = (searchTerms: string[], json: NewsResponse) => {
 
     return newsUrls;
 };
+// TODO: still used?
 export const getSearchPages = (limit: number, totalPages?: number) => {
     const pages: number[] = [];
     const lastPage = Math.max(1, Math.min(totalPages ?? limit, limit));
@@ -41,23 +40,30 @@ export const getSearchPages = (limit: number, totalPages?: number) => {
 export const getSearchArticleUrls = (searchTerms: string[], endpoint: ENDPOINT) => {
 
     const articleUrls: string[] = [];
-    const pages = getSearchPages(SEARCH_PAGE_LIMIT);
-    pages.forEach((page) => {
-        const json = getJSON(`${endpoint.url}${page}`);
-        const totalPages = json?.data?.totalPages ?? 0;
-        if(page > totalPages){
-            LOG.WARN(`Seite ${page} existiert nicht (nur ${totalPages} Seiten insgesamt), überspringe weitere Anfragen...`);
-            return;
+    let totalPages = SEARCH_PAGE_LIMIT;
+
+    for (let page = 1; page <= SEARCH_PAGE_LIMIT; page += 1) {
+        if (page > totalPages) {
+            break;
         }
+
+        const json = getJSON(`${endpoint.url}${page}`);
+        totalPages = json?.data?.totalPages ?? 0;
+
+        if (page > totalPages) {
+            LOG.WARN(`Seite ${page} existiert nicht (nur ${totalPages} Seiten insgesamt), überspringe weitere Anfragen...`);
+            break;
+        }
+
         const pageArticleUrls = getNewsUrls(searchTerms, json).map((url) => toAbsoluteUrl(url, endpoint));
 
         if (pageArticleUrls.length === 0) {
-            return;
+            continue;
         }
 
         articleUrls.push(...pageArticleUrls);
-    });
+    }
+
     return unique(Array.from(new Set(articleUrls)));
 };
-
 

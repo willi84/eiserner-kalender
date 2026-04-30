@@ -19,6 +19,62 @@ export const toIsoDateTime = (startsAtLine: string) => {
     return `${isoDate}T${isoTime}${timezone}`;
 };
 
+export const toUtcIcalDateTime = (localDateTime: string, timeZone: string) => {
+    const utcDate = toUtcDate(localDateTime, timeZone);
+    return utcDate.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+};
+
+const toUtcDate = (localDateTime: string, timeZone: string) => {
+    const { year, month, day, hour, minute, second } = parseLocalDateTime(localDateTime);
+    const utcGuess = Date.UTC(year, month - 1, day, hour, minute, second);
+    const offsetMinutes = getTimeZoneOffsetMinutes(timeZone, new Date(utcGuess));
+
+    return new Date(utcGuess - offsetMinutes * 60_000);
+};
+
+const parseLocalDateTime = (localDateTime: string) => {
+    const match = localDateTime.match(
+        /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/,
+    );
+
+    if (!match) {
+        throw new Error(`Invalid local date-time: ${localDateTime}`);
+    }
+
+    const [, year, month, day, hour, minute, second] = match;
+    return {
+        year: Number(year),
+        month: Number(month),
+        day: Number(day),
+        hour: Number(hour),
+        minute: Number(minute),
+        second: Number(second),
+    };
+};
+
+const getTimeZoneOffsetMinutes = (timeZone: string, date: Date) => {
+    const timeZoneName = new Intl.DateTimeFormat('en-US', {
+        timeZone,
+        timeZoneName: 'longOffset',
+    })
+        .formatToParts(date)
+        .find((part) => part.type === 'timeZoneName')
+        ?.value ?? '';
+
+    if (timeZoneName === 'GMT') {
+        return 0;
+    }
+
+    const match = timeZoneName.match(/^GMT([+-]\d{2}):(\d{2})$/);
+    if (!match) {
+        throw new Error(`Unsupported timezone offset for ${timeZone}: ${timeZoneName}`);
+    }
+
+    const [, hours, minutes] = match;
+    const sign = hours.startsWith('-') ? -1 : 1;
+    return sign * (Math.abs(Number(hours)) * 60 + Number(minutes));
+};
+
 const normalizeTimezone = (timezoneId: string) => {
     if (!timezoneId) {
         return 'Z';
