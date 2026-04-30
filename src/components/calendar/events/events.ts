@@ -76,7 +76,6 @@ export const getEvents = (url: string, ics: string, abgerufenAm: string, debug =
         fetchedAt: abgerufenAm,
         eventCount: spiele.length,
     });
-    console.log(getSourceName(url))
 
     return {
         verein: HOME_TEAM,

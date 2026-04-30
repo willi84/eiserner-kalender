@@ -98,13 +98,15 @@ describe('createIcsContent()', () => {
         ]);
 
         expect(ics).toContain('BEGIN:VCALENDAR');
+        expect(ics).toContain('X-WR-CALNAME:Eiserner Kalender');
+        expect(ics).toContain('X-WR-TIMEZONE:Europe/Berlin');
+        expect(ics).toContain('BEGIN:VTIMEZONE');
         expect(ics).toContain('SUMMARY:⚽️🎲 Losbuchung: FC St. Pauli');
         expect(ics).toContain(
             `DESCRIPTION:- Partie: 1. FC Union Berlin vs. FC St. Pauli\\n- Aktualisiert: 16.04.2026\\n- Quelle: ${HOST}/article`,
         );
-        expect(ics).toContain('DTSTART:20260320T100000');
-        expect(ics).toContain('DTEND:20260323T090000');
+        expect(ics).toContain('DTSTART;TZID=Europe/Berlin:20260320T100000');
+        expect(ics).toContain('DTEND;TZID=Europe/Berlin:20260323T090000');
         expect(ics).toContain('END:VCALENDAR');
-        console.log(ics)
     });
 });

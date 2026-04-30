@@ -22,5 +22,6 @@ describe('toIsoDateTime()', () => {
     it('converts a valid DTSTART line to ISO 8601 format', () => {
         expect(FN('DTSTART:20240615T193000')).toBe('2024-06-15T19:30:00Z');
         expect(FN('DTSTART;TZID="+02:00":20240615T193000')).toBe('2024-06-15T19:30:00+02:00');
+        expect(FN('DTSTART;TZID=Europe/Berlin:20240615T193000')).toBe('2024-06-15T19:30:00');
     });
 });

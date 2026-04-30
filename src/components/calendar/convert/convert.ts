@@ -8,7 +8,6 @@ import { getCanonicalTeamName } from '../../../teams/team-synonyms/team-synonyms
 import type { LotteryArticle } from 'lottery/parser/parser.d';
 
 export const createUid = (event: LotteryEvent) => {
-    console.log(event);
     return createHash('sha1')
         .update(`${event.type}|${event.opponent}|${event.startsAt}|${event.articleUrl}`)
         .digest('hex');

@@ -6,7 +6,6 @@ import { getJSON } from '@_shared/fetch/fetch';
 import { ENDPOINT } from '@config/endpoint';
 
 const toAbsoluteUrl = (url: string, endpoint: ENDPOINT) => {
-    console.log(endpoint.host);
     return `${endpoint.host}${url}`;
 }
 

@@ -16,6 +16,8 @@ export const CURRENT_SEASON = '2025/26';
 
 export const OUTPUT_DIR = 'output';
 export const CALENDAR_ID = 'eiserner-kalender';
+export const CALENDAR_TITLE = 'Eiserner Kalender';
+export const CALENDAR_TIMEZONE = 'Europe/Berlin';
 
 export const SUMMARY_TYPES: { [key in LotteryEventType]: string } = {
     'losbuchung': '⚽️🎲 Losbuchung',

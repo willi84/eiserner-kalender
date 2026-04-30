@@ -6,7 +6,6 @@ import { LOG } from '@_shared/log/log';
 const path = require('node:path');
 const SAMPLE_RESPONSE = FS.readFile(path.join(__dirname, 'news-sample.json')) || '{}';
 const SAMPLE_JSON = JSON.parse(SAMPLE_RESPONSE);
-console.log(SAMPLE_JSON);
 
 describe('getNewsUrls()', () => {
     const FN = getNewsUrls;
@@ -69,7 +68,6 @@ describe('getSearchArticleUrls()', () => {
                 }
             
             } else if(request.includes('invalid.com')) {
-                console.log('else');
                 return {
                     data: {
                         news: [],
