@@ -49,6 +49,7 @@ describe('test FS', () => {
         mock({
             tmp: {
                 'file.txt': 'xx',
+                'file.bin': Buffer.from([0x89, 0x50, 0x4e, 0x47]),
                 'file.json': '{ "xxx": 2}',
                 'invalidKey.json': `{ xxx: 2, "yyy": "foobar", bla: "blubber", holsten: { "bla": "kosten"}}`,
             },
@@ -237,6 +238,12 @@ describe('test FS', () => {
                 '{ xxx: 2, "yyy": "foobar", bla: "blubber", holsten: { "bla": "kosten"}}';
             expect(content).toEqual(EXPECTED);
         });
+        it('should read a file as buffer when encoding is null', () => {
+            const content = FS.readFile('tmp/file.bin', { encoding: null });
+
+            expect(Buffer.isBuffer(content)).toEqual(true);
+            expect(content).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+        });
     });
     describe('writeFile', () => {
         // TODO: json
@@ -299,6 +306,13 @@ describe('test FS', () => {
             const result = checkChanges(currentFileContent, FILE);
             expect(result.status).toEqual(Status.EXTENDED);
             expect(fs.readFileSync(`${FILE}`).toString()).toEqual('xxxyyy');
+        });
+        it('write buffer', () => {
+            const raw = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+
+            FS.writeFile(`${FILE}`, raw);
+
+            expect(fs.readFileSync(`${FILE}`)).toEqual(raw);
         });
         xit('errors', () => {});
     });

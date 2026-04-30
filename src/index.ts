@@ -70,9 +70,25 @@ const fetchIcs = (url: string) => {
 const writeOutputFile = (fileName: string, content: string) => {
     const PATH = `${OUTPUT_DIR}/${fileName}`;
     FS.writeFile(PATH, content);
-    LOG.OK('Output file written', {
+    LOG.OK(`Output file ${fileName} written`, {
         fileName,
         bytes: FS.size(PATH),
+    });
+};
+
+const copyAssetFile = (sourcePath: string, outputFile: string) => {
+    const content = FS.readFile(sourcePath, { encoding: null });
+
+    if (!content || !Buffer.isBuffer(content)) {
+        LOG.FAIL(`Asset file ${outputFile} could not be copied`);
+        return;
+    }
+
+    const path = `${OUTPUT_DIR}/${outputFile}`;
+    FS.writeFile(path, content);
+    LOG.OK(`Asset file ${outputFile} written`, {
+        fileName: outputFile,
+        bytes: FS.size(path),
     });
 };
 
@@ -207,6 +223,8 @@ export const runExport = () => {
     removeLegacyOutputFiles();
     EXPORT_FILES.map(({ content, outputFile }) => writeOutputFile(outputFile, content));
     writeOutputFile('index.html', createIndexHtml(EXPORT_FILES, debug));
+    writeOutputFile('assets/favicon.svg', FS.readFile('./src/assets/favicon.svg') || '');
+    copyAssetFile('./src/assets/favicon.png', 'assets/favicon.png');
     createLotteryDebugConsoleOutput(debug);
 
     const exportedFiles = EXPORT_FILES.map(({ label, outputFile }) => ({ label, outputFile }));

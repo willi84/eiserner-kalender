@@ -3,6 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="./assets/favicon.svg" sizes="any" type="image/svg+xml">
+    <link rel="icon" href="./assets/favicon.png" sizes="48x48" type="image/png">
     <title>Eiserner Kalender Export</title>
     <style>
       :root {
@@ -40,6 +42,7 @@
       }
 
       .hero,
+      footer,
       .debug {
         background: rgba(255, 255, 255, 0.92);
         border: 1px solid var(--union-line);
@@ -126,8 +129,14 @@
         letter-spacing: 0.08em;
       }
 
+      .hero-input-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+
       .hero-input {
-        width: 100%;
+        flex: 1;
         padding: 0.8rem 0.95rem;
         border: 1px solid var(--union-line);
         border-radius: 0.8rem;
@@ -137,6 +146,28 @@
       }
 
       .hero-input:focus {
+        outline: 2px solid rgba(227, 6, 19, 0.22);
+        outline-offset: 2px;
+      }
+
+      .hero-copy-button {
+        flex-shrink: 0;
+        padding: 0.8rem 0.9rem;
+        border: 1px solid var(--union-line);
+        border-radius: 0.8rem;
+        background: var(--union-white);
+        color: var(--union-red-dark);
+        font: inherit;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .hero-copy-button:hover {
+        border-color: rgba(227, 6, 19, 0.35);
+      }
+
+      .hero-copy-button:focus {
         outline: 2px solid rgba(227, 6, 19, 0.22);
         outline-offset: 2px;
       }
@@ -201,7 +232,7 @@
         border-radius: 1.25rem;
         padding: 0;
       }
-
+      .box,
       .debug-summary {
         display: flex;
         align-items: center;
@@ -210,6 +241,28 @@
         padding: 1.25rem;
         cursor: pointer;
         list-style: none;
+      }
+      .box{
+        justify-content: inherit;
+        gap: inherit;
+        text-align: left;
+        flex-wrap: wrap;
+      }
+
+      .footer-copy {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        flex-wrap: wrap;
+        line-height: 1.5;
+      }
+
+      .footer-copy p {
+        margin: 0;
+      }
+
+      .footer-copy a {
+        white-space: nowrap;
       }
 
       .debug-summary::-webkit-details-marker {
@@ -315,11 +368,14 @@
             </p>
             <div class="hero-action">
               <label class="hero-label" for="lottery-calendar-url">Kalender-URL</label>
-              <input
-                class="hero-input"
-                id="lottery-calendar-url"
-                value="https://eiserner-kalender.de/union_lottery.ics"
-              />
+              <div class="hero-input-row">
+                <input
+                  class="hero-input"
+                  id="lottery-calendar-url"
+                  value="https://eiserner-kalender.de/union_lottery.ics"
+                />
+                <button class="hero-copy-button" id="copy-calendar-url" type="button">Copy</button>
+              </div>
             </div>
           </div>
         </div>
@@ -353,6 +409,26 @@
           </div>
         </div>
       </details>
+      <footer class="debug">
+        <div class="box footer-copy">
+          <p>Ein Projekt mit ❤️ Herz von <a href="https://robert.berlin">Robert Willemelis</a>. Link zu <a href="https://github.com/willi84/eiserner-kalender">Github</a>.</p>
+        </div>
+      </footer>
     </main>
+    <script>
+      const calendarInput = document.getElementById('lottery-calendar-url');
+      const copyButton = document.getElementById('copy-calendar-url');
+
+      if (calendarInput instanceof HTMLInputElement && copyButton instanceof HTMLButtonElement) {
+        copyButton.addEventListener('click', async () => {
+          await navigator.clipboard.writeText(calendarInput.value);
+          copyButton.textContent = 'Kopiert';
+
+          window.setTimeout(() => {
+            copyButton.textContent = 'Copy';
+          }, 1600);
+        });
+      }
+    </script>
   </body>
 </html>

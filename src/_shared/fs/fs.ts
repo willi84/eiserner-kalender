@@ -15,8 +15,11 @@ export enum Status {
     NO_CHANGES = 7,
 }
 
-export const size = (value: string | object) => {
+export const size = (value: string | object | Buffer) => {
     if (typeof value === 'object') {
+        if (Buffer.isBuffer(value)) {
+            return value.length;
+        }
         value = JSON.stringify(value);
     }
     const size = Buffer.from(value).length;
@@ -88,29 +91,27 @@ export class FS {
         }
         fs.renameSync(oldFolder, newFolder);
     }
-    static readFile(path: string, options: any = {}) {
-        options['encoding'] = 'utf8';
-
+    static readFile(path: string, options: any = {}): any {
         try {
-            // , { flag: 'wx' }
-            const fileStream = fs.readFileSync(path);
+            if (options.encoding === null) {
+                return fs.readFileSync(path);
+            }
 
-            let str = fileStream.toString();
-            return str;
+            return fs.readFileSync(path, { ...options, encoding: 'utf8' });
         } catch (error: any) {
             LOG.FAIL(`[FS] readFile: ${error}`);
         }
     }
     static writeFile(
         path: string,
-        rawData: string | object,
+        rawData: string | object | Buffer,
         option = 'replace',
         createDirectory = true
-    ) {
+    ): void {
         const folder = FS.getFolder(path);
 
-        const data: string =
-            typeof rawData === 'string'
+        const data =
+            typeof rawData === 'string' || Buffer.isBuffer(rawData)
                 ? rawData
                 : JSON.stringify(rawData, null, 4);
         const options = option === 'attach' ? { flag: 'a+' } : {};

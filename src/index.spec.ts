@@ -39,7 +39,8 @@ describe('createIndexHtml()', () => {
             },
         );
 
-        expect(html).toContain('./assets/logo.svg');
+        expect(html).toContain('assets/favicon.svg');
+        // expect(html).toContain('./assets/logo.svg');
         expect(html).toContain('class="file-grid"');
         expect(html).toContain('class="file-card"');
         expect(html).toContain('./unionspiele_maenner.json');
@@ -78,10 +79,10 @@ describe('createIndexHtml()', () => {
         const result = createIndexHtml(EXPORTS, LOTTERY_DEBUG);
 
         expect(result).toContain('<section class="hero">');
-        expect(result).toContain('<h1>Dateien & Exporte</h1>');
+        expect(result).toContain('<h1>Kalender & Exporte</h1>');
         expect(result).toContain('<strong>Männer</strong>');
         expect(result).toContain('<p class="file-name">unionspiele_maenner.json</p>');
-        expect(result).toContain('<section class="debug">');
+        expect(result).toContain('<details class="debug">');
         expect(result).toContain('<h3>Status</h3>');
         expect(result).toContain('Suchbegriffe: losverfahren, lostermine');
     });
