@@ -2,8 +2,24 @@ import * as readline from 'readline';
 import { colors, LogType } from './log.config';
 import { COLOR_SETS, LOG } from './log';
 import type { COLOR_SET, LogOpts } from './log.d';
-const { execSync } = require('child_process');
+// const { execSync } = require('child_process');
 const clearOutput = true; // for debugging purposes
+
+// src/_shared/log/log.ts
+import { execSync } from "node:child_process";
+
+export function clearScreen() {
+  const isCi = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
+  const hasTerm = !!process.env.TERM;
+  const isTty = !!process.stdout.isTTY;
+
+  if (isCi || !hasTerm || !isTty) {
+    // In CI/non-interactive environments, do nothing.
+    return;
+  }
+
+  execSync("clear", { stdio: "ignore" });
+}
 
 let spyLog: jest.SpyInstance;
 let spyColorize: jest.SpyInstance;
@@ -114,6 +130,7 @@ describe('log library', () => {
                     if (clearOutput && !hasNewline)
                         readline.cursorTo(process.stdout, 0, 0);
                     // if (clearOutput && hasNewline) execSync('clear'); // not working in CI
+                    if (clearOutput && hasNewline) clearScreen(); // not working in CI
                 });
             }
         );
