@@ -113,7 +113,7 @@ describe('log library', () => {
                 afterEach(() => {
                     if (clearOutput && !hasNewline)
                         readline.cursorTo(process.stdout, 0, 0);
-                    if (clearOutput && hasNewline) execSync('clear');
+                    // if (clearOutput && hasNewline) execSync('clear'); // not working in CI
                 });
             }
         );
